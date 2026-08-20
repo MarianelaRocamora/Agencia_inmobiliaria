@@ -9,6 +9,7 @@ builder.Services.AddControllersWithViews();
 // Registro de repositorios (ADO.NET)
 //builder.Services.AddScoped<RepositorioPropietario>();
 builder.Services.AddScoped<IRepositorioInquilino, RepositorioInquilino>();
+builder.Services.AddScoped<IRepositorioPropietario, RepositorioPropietario>();
 
 var app = builder.Build();
 

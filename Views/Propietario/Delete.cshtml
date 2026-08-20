@@ -1,13 +1,13 @@
-@model Agencia_inmobiliaria.Models.Inquilino
+@model Agencia_inmobiliaria.Models.Propietario
 
 @{
-    ViewData["Title"] = "Eliminar Inquilino";
+    ViewData["Title"] = "Eliminar Propietario";
 }
 
-<h1>Eliminar Inquilino</h1>
+<h1>Eliminar Propietario</h1>
 
 <div class="alert alert-warning">
-    ¿Estás seguro de que querés eliminar este inquilino?
+    ¿Estás seguro de que querés eliminar este propietario?
 </div>
 
 <dl class="row">
@@ -31,7 +31,7 @@
 </dl>
 
 <form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="IdInquilino" />
+    <input type="hidden" asp-for="IdPropietario" />
     <button type="submit" class="btn btn-danger">Confirmar eliminación</button>
     <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
 </form>
