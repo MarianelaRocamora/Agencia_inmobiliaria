@@ -1,7 +1,14 @@
+using Agencia_inmobiliaria.Models;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Registro de repositorios (ADO.NET)
+//builder.Services.AddScoped<RepositorioPropietario>();
+builder.Services.AddScoped<IRepositorioInquilino, RepositorioInquilino>();
 
 var app = builder.Build();
 

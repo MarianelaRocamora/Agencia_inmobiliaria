@@ -1,8 +1,3 @@
-//"che, tu clase RepositorioInquilino promete cumplir con la interfaz IRepositorioInquilino, pero le faltan los métodos que esa interfaz exige".
-// completar la clase RepositorioInquilino con el código de esos 6 método
-
-
-
 using MySql.Data.MySqlClient;
 
 namespace Agencia_inmobiliaria.Models
@@ -41,7 +36,7 @@ namespace Agencia_inmobiliaria.Models
         public int Baja(int id)
         {
             int filasAfectadas = 0;
-            string sql = "UPDATE inquilino SET estado = 0 WHERE idInquilino = @id";
+            string sql = "UPDATE inquilino SET estado = 0 WHERE ID_inquilino = @id";
 
             using (var connection = new MySqlConnection(connectionString))
             {
@@ -66,7 +61,7 @@ namespace Agencia_inmobiliaria.Models
                             email = @email,
                             direccion = @direccion,
                             estado = @estado
-                            WHERE idInquilino = @id";
+                            WHERE ID_inquilino = @id";
 
             using (var connection = new MySqlConnection(connectionString))
             {
@@ -90,10 +85,10 @@ namespace Agencia_inmobiliaria.Models
         public IList<Inquilino> ObtenerLista(int paginaNro = 1, int tamPagina = 10)
         {
             var lista = new List<Inquilino>();
-            string sql = @"SELECT idInquilino, nombre, apellido, dni, telefono, email, direccion, estado
+            string sql = @"SELECT ID_inquilino, nombre, apellido, dni, telefono, email, direccion, estado
                             FROM inquilino
                             WHERE estado = 1
-                            ORDER BY idInquilino
+                            ORDER BY ID_inquilino
                             LIMIT @tamPagina OFFSET @offset";
 
             using (var connection = new MySqlConnection(connectionString))
@@ -109,7 +104,7 @@ namespace Agencia_inmobiliaria.Models
                     {
                         lista.Add(new Inquilino
                         {
-                            IdInquilino = reader.GetInt32("idInquilino"),
+                            IdInquilino = reader.GetInt32("ID_inquilino"),
                             Nombre = reader.GetString("nombre"),
                             Apellido = reader.GetString("apellido"),
                             Dni = reader.GetString("dni"),
@@ -143,9 +138,9 @@ namespace Agencia_inmobiliaria.Models
         public Inquilino? ObtenerPorId(int id)
         {
             Inquilino? inquilino = null;
-            string sql = @"SELECT idInquilino, nombre, apellido, dni, telefono, email, direccion, estado
+            string sql = @"SELECT ID_inquilino, nombre, apellido, dni, telefono, email, direccion, estado
                             FROM inquilino
-                            WHERE idInquilino = @id";
+                            WHERE ID_inquilino = @id";
 
             using (var connection = new MySqlConnection(connectionString))
             {
@@ -159,7 +154,7 @@ namespace Agencia_inmobiliaria.Models
                     {
                         inquilino = new Inquilino
                         {
-                            IdInquilino = reader.GetInt32("idInquilino"),
+                            IdInquilino = reader.GetInt32("ID_inquilino"),
                             Nombre = reader.GetString("nombre"),
                             Apellido = reader.GetString("apellido"),
                             Dni = reader.GetString("dni"),
