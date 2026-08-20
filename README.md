@@ -42,3 +42,6 @@ Luego abrir en el navegador la URL que indique la consola y navegar a:
 
 /Inquilinos — ABM de Inquilinos
 /Propietarios — ABM de Propietarios
+
+<img width="1600" height="619" alt="image" src="https://github.com/user-attachments/assets/4f6c8cbf-1107-4cc5-8ef1-770f000797cd" />
+
