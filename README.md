@@ -64,7 +64,7 @@ dotnet add package MySql.Data
 2. Abrir **phpMyAdmin** desde [`http://localhost/phpmyadmin`](http://localhost/phpmyadmin).
 3. Crear una base de datos nueva llamada **`inmobiliaria`**.
 4. Entrar a la base `inmobiliaria` y abrir la pestaña **Importar**.
-5. Seleccionar el archivo `database.sql` de este repositorio y hacer clic en **Continuar**.
+5. Seleccionar el archivo `inmobiliaria.sql` de este repositorio y hacer clic en **Continuar**.
 6. Verificar en la pestaña **Estructura** que se hayan creado las tablas `inquilino` y `propietario`.
 
 ---
