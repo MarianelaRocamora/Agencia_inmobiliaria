@@ -15,8 +15,16 @@ namespace Agencia_inmobiliaria.Controllers
         
         public IActionResult Index()
         {
-            var lista = repositorio.ObtenerLista(1, 100);
-            return View(lista);
+            try
+            {
+                var lista = repositorio.ObtenerLista(1, 100);
+                return View(lista);
+            }
+            catch (Exception)
+            {
+                TempData["error"] = "No se pudo cargar el listado. Intente nuevamente.";
+                return View(new List<Propietario>());
+            }
         }
 
         
@@ -39,6 +47,7 @@ namespace Agencia_inmobiliaria.Controllers
             {
                 propietario.Estado = true;
                 repositorio.Alta(propietario);
+                TempData["success"] = "Propietario creado exitosamente";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -51,12 +60,20 @@ namespace Agencia_inmobiliaria.Controllers
         
         public IActionResult Edit(int id)
         {
-            var propietario = repositorio.ObtenerPorId(id);
-            if (propietario == null)
+            try
             {
-                return NotFound();
+                var propietario = repositorio.ObtenerPorId(id);
+                if (propietario == null)
+                {
+                    return NotFound();
+                }
+                return View(propietario);
             }
-            return View(propietario);
+            catch (Exception)
+            {
+                TempData["error"] = "No se pudo cargar el propietario. Intente nuevamente.";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         
@@ -72,7 +89,16 @@ namespace Agencia_inmobiliaria.Controllers
             try
             {
                 propietario.IdPropietario = id;
-                repositorio.Modificacion(propietario);
+                int filasAfectadas = repositorio.Modificacion(propietario);
+                if (filasAfectadas > 0)
+                {
+                    TempData["success"] = "Propietario modificado exitosamente";
+                }
+                else
+                {
+                    TempData["error"] = "No se pudo modificar el propietario. Verificá que exista.";
+                }
+                
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -85,12 +111,20 @@ namespace Agencia_inmobiliaria.Controllers
         
         public IActionResult Delete(int id)
         {
-            var propietario = repositorio.ObtenerPorId(id);
-            if (propietario == null)
+            try
             {
-                return NotFound();
+                var propietario = repositorio.ObtenerPorId(id);
+                if (propietario == null)
+                {
+                    return NotFound();
+                }
+                return View(propietario);
             }
-            return View(propietario);
+            catch (Exception)
+            {
+                TempData["error"] = "No se pudo cargar el propietario. Intente nuevamente.";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         
@@ -98,7 +132,15 @@ namespace Agencia_inmobiliaria.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            repositorio.Baja(id);
+            try
+            {
+                repositorio.Baja(id);
+                TempData["success"] = "Propietario borrado exitosamente";
+            }
+            catch (Exception)
+            {
+                TempData["error"] = "No se pudo eliminar el inquilino. Intente nuevamente.";
+            }
             return RedirectToAction(nameof(Index));
         }
     }
