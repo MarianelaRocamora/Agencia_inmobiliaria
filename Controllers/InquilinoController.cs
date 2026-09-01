@@ -13,20 +13,30 @@ namespace Agencia_inmobiliaria.Controllers
         }
 
         // GET: Inquilinos
-        public IActionResult Index()
+        public IActionResult Index(int pagina = 1)
         {
-            try
-            {
-                var lista = repositorio.ObtenerLista(1, 100);
-                return View(lista);
-            }
-            catch (Exception)
-            {
-                TempData["error"] = "No se pudo cargar el listado. Intente nuevamente.";
-                return View(new List<Inquilino>());
-            }
-        }
+             try
+                {
+                    int tamPagina = 10;
+                    pagina = Math.Max(pagina, 1);
 
+                    var lista = repositorio.ObtenerLista(pagina, tamPagina);
+                    int totalRegistros = repositorio.ObtenerCantidad();
+                    int totalPaginas = totalRegistros == 0
+                        ? 1
+                        : (totalRegistros % tamPagina == 0 ? totalRegistros / tamPagina : totalRegistros / tamPagina + 1);
+
+                    ViewBag.PaginaActual = pagina;
+                    ViewBag.TotalPaginas = totalPaginas;
+
+                    return View(lista);
+                }
+                catch (Exception)
+                {
+                    TempData["error"] = "No se pudo cargar el listado. Intente nuevamente.";
+                    return View(new List<Inquilino>());
+                }
+        }
         // GET: Inquilinos/Create
         public IActionResult Create()
         {
