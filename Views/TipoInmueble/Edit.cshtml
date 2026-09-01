@@ -1,0 +1,26 @@
+@model Agencia_inmobiliaria.Models.TipoInmueble
+
+@{
+    ViewData["Title"] = "Editar Tipo de inmueble";
+}
+
+<h1>Editar Tipo de Inmueble</h1>
+
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="IdTipoInmueble" />
+
+    <div class="form-group mb-2">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+    
+
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,37 @@
+@model IEnumerable<Agencia_inmobiliaria.Models.TipoInmueble>
+
+@{
+    ViewData["Title"] = "Tipos de Inmuebles";
+}
+
+<h1>Tipos de inmuebles</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nuevo Tipo de inmueble</a>
+</p>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Nombre</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.IdTipoInmueble" class="btn btn-sm btn-secondary">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.IdTipoInmueble" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
