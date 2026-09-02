@@ -3,13 +3,11 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 20-08-2026 a las 03:04:10
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -55,6 +53,39 @@ CREATE TABLE `propietario` (
   `estado` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_inmueble`
+--
+
+CREATE TABLE `tipo_inmueble` (
+  `ID_tipo_inmueble` int(11) NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `estado` tinyint(4) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `inmueble`
+--
+
+CREATE TABLE `inmueble` (
+  `ID_inmueble` int(11) NOT NULL,
+  `direccion` varchar(255) NOT NULL,
+  `cupo` int(11) NOT NULL,
+  `precio_dia` decimal(10,2) NOT NULL,
+  `porcentaje_reserva` decimal(5,2) NOT NULL,
+  `latitud` decimal(10,6) NOT NULL,
+  `longitud` decimal(10,6) NOT NULL,
+  `portada` varchar(255) DEFAULT NULL,
+  `disponible` tinyint(4) NOT NULL DEFAULT 1,
+  `ID_tipo_inmueble` int(11) NOT NULL,
+  `ID_propietario` int(11) NOT NULL,
+  `estado` tinyint(4) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Índices para tablas volcadas
 --
@@ -74,6 +105,20 @@ ALTER TABLE `propietario`
   ADD UNIQUE KEY `dni` (`dni`);
 
 --
+-- Indices de la tabla `tipo_inmueble`
+--
+ALTER TABLE `tipo_inmueble`
+  ADD PRIMARY KEY (`ID_tipo_inmueble`);
+
+--
+-- Indices de la tabla `inmueble`
+--
+ALTER TABLE `inmueble`
+  ADD PRIMARY KEY (`ID_inmueble`),
+  ADD KEY `FK_inmueble_tipo_inmueble` (`ID_tipo_inmueble`),
+  ADD KEY `FK_inmueble_propietario` (`ID_propietario`);
+
+--
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
@@ -88,6 +133,29 @@ ALTER TABLE `inquilino`
 --
 ALTER TABLE `propietario`
   MODIFY `ID_propietario` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_inmueble`
+--
+ALTER TABLE `tipo_inmueble`
+  MODIFY `ID_tipo_inmueble` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `inmueble`
+--
+ALTER TABLE `inmueble`
+  MODIFY `ID_inmueble` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `inmueble`
+--
+ALTER TABLE `inmueble`
+  ADD CONSTRAINT `FK_inmueble_tipo_inmueble` FOREIGN KEY (`ID_tipo_inmueble`) REFERENCES `tipo_inmueble` (`ID_tipo_inmueble`),
+  ADD CONSTRAINT `FK_inmueble_propietario` FOREIGN KEY (`ID_propietario`) REFERENCES `propietario` (`ID_propietario`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
