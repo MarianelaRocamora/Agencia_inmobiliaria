@@ -79,7 +79,7 @@ namespace Agencia_inmobiliaria.Models
                             ID_inmueble = @ID_inmueble,
                             ID_inquilino = @ID_inquilino,
                             estado = @estado
-                            WHERE ID_inquilino = @id";
+                            WHERE ID_reserva = @id";
 
             using (var connection = new MySqlConnection(connectionString))
             {
@@ -119,9 +119,13 @@ namespace Agencia_inmobiliaria.Models
             if (paginaNro < 1) paginaNro = 1;
             if (tamPagina < 1) tamPagina = 10;
             var lista = new List<Reserva>();
-            string sql = @"SELECT ID_reserva, fecha_ingreso, fecha_egreso, monto_dia, ID_inmueble, ID_inquilino, fecha_cancelacion, estado
-                            FROM reserva
-                            WHERE estado = 1
+            string sql = @"SELECT r.ID_reserva, r.fecha_ingreso, r.fecha_egreso, r.monto_dia, r.ID_inmueble, r.ID_inquilino, r.fecha_cancelacion, r.estado,
+                                  i.nombre AS inq_nombre, i.apellido AS inq_apellido, i.dni AS inq_dni, i.telefono, i.email, i.direccion AS inq_direccion,
+                                  inm.direccion AS inm_direccion, inm.precio_dia AS inm_precioDia
+                            FROM reserva r
+                            JOIN inquilino i ON r.ID_inquilino = i.ID_inquilino
+                            JOIN inmueble inm ON r.ID_inmueble = inm.ID_inmueble
+                            WHERE r.estado = 1
                             ORDER BY ID_reserva
                             LIMIT @tamPagina OFFSET @offset";
 
@@ -147,7 +151,23 @@ namespace Agencia_inmobiliaria.Models
                             FechaCancelacion = reader.IsDBNull(reader.GetOrdinal("fecha_cancelacion"))
                                                ? (DateTime?)null
                                                : reader.GetDateTime("fecha_cancelacion"),
-                            Estado = reader.GetBoolean("estado")
+                            Estado = reader.GetBoolean("estado"),
+                             Inquilino = new Inquilino
+                            {
+                                IdInquilino = reader.GetInt32("ID_inquilino"),
+                                Nombre = reader.GetString("inq_nombre"),
+                                Apellido = reader.GetString("inq_apellido"),
+                                Dni = reader.GetString("inq_dni"),
+                                Telefono = reader.GetString("telefono"),
+                                Email = reader.GetString("email"),
+                                Direccion = reader.GetString("inq_direccion")
+                            },
+                            Inmueble = new Inmueble
+                            {
+                                IdInmueble = reader.GetInt32("ID_inmueble"),
+                                Direccion = reader.GetString("inm_direccion"),
+                                PrecioDia = reader.GetDecimal("inm_precioDia")
+                            }
                         });
                     }
                 }
@@ -159,8 +179,14 @@ namespace Agencia_inmobiliaria.Models
         public Reserva? ObtenerPorId(int id)
         {
             Reserva? reserva = null;
-            string sql = @"SELECT ID_reserva, fecha_ingreso, fecha_egreso, monto_dia, ID_inmueble, ID_inquilino, fecha_cancelacion, estado
-                            FROM reserva
+            string sql = @"SELECT r.ID_reserva, r.fecha_ingreso, r.fecha_egreso, r.monto_dia, r.ID_inmueble, r.ID_inquilino, r.fecha_cancelacion, r.estado,
+                                  i.nombre AS inq_nombre, i.apellido AS inq_apellido, i.dni AS inq_dni, i.telefono, i.email, i.direccion AS inq_direccion,
+                                  inm.direccion AS inm_direccion, inm.precio_dia AS inm_precioDia, inm.cupo AS inm_cupo, inm.ID_tipo_inmueble AS inm_idTipoInmueble,
+                                  ti.nombre AS tipoNombre
+                            FROM reserva r
+                            JOIN inquilino i ON r.ID_inquilino = i.ID_inquilino
+                            JOIN inmueble inm ON r.ID_inmueble = inm.ID_inmueble
+                            JOIN tipo_inmueble ti ON inm.ID_tipo_inmueble = ti.ID_tipo_inmueble
                             WHERE ID_reserva = @id";
 
             using (var connection = new MySqlConnection(connectionString))
@@ -184,7 +210,30 @@ namespace Agencia_inmobiliaria.Models
                             FechaCancelacion = reader.IsDBNull(reader.GetOrdinal("fecha_cancelacion"))
                                                ? (DateTime?)null
                                                : reader.GetDateTime("fecha_cancelacion"),
-                            Estado = reader.GetBoolean("estado")
+                            Estado = reader.GetBoolean("estado"),
+                            Inquilino = new Inquilino
+                            {
+                                IdInquilino = reader.GetInt32("ID_inquilino"),
+                                Nombre = reader.GetString("inq_nombre"),
+                                Apellido = reader.GetString("inq_apellido"),
+                                Dni = reader.GetString("inq_dni"),
+                                Telefono = reader.GetString("telefono"),
+                                Email = reader.GetString("email"),
+                                Direccion = reader.GetString("inq_direccion")
+                            },
+                            Inmueble = new Inmueble
+                            {
+                                IdInmueble = reader.GetInt32("ID_inmueble"),
+                                Direccion = reader.GetString("inm_direccion"),
+                                PrecioDia = reader.GetDecimal("inm_precioDia"),
+                                Cupo = reader.GetInt32("inm_cupo"),
+                                IdTipoInmueble = reader.GetInt32("inm_idTipoInmueble"),
+                                TipoInmueble = new TipoInmueble
+                                {
+                                    IdTipoInmueble = reader.GetInt32("inm_idTipoInmueble"),
+                                    Nombre = reader.GetString("tipoNombre")
+                                }
+                            }
                         };
                     }
                 }

@@ -1,0 +1,81 @@
+@model Agencia_inmobiliaria.Models.Reserva
+
+@{
+    ViewData["Title"] = "Detalle de la Reserva";
+}
+
+<h1>Detalle de la Reserva</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <h4>Datos del Inquilino</h4>
+        <dl class="row">
+            <dt class="col-sm-4">Nombre</dt>
+            <dd class="col-sm-8">@Model.Inquilino?.Nombre @Model.Inquilino?.Apellido</dd>
+
+            <dt class="col-sm-4">DNI</dt>
+            <dd class="col-sm-8">@Model.Inquilino?.Dni</dd>
+
+            <dt class="col-sm-4">Teléfono</dt>
+            <dd class="col-sm-8">@Model.Inquilino?.Telefono</dd>
+
+            <dt class="col-sm-4">Email</dt>
+            <dd class="col-sm-8">@Model.Inquilino?.Email</dd>
+        </dl>
+    </div>
+
+    <div class="col-md-6">
+        <h4>Datos del Inmueble</h4>
+        <dl class="row">
+            <dt class="col-sm-4">Dirección</dt>
+            <dd class="col-sm-8">@Model.Inmueble?.Direccion</dd>
+
+            <dt class="col-sm-4">Tipo</dt>
+            <dd class="col-sm-8">@Model.Inmueble?.TipoInmueble?.Nombre</dd>
+
+            <dt class="col-sm-4">Cupo</dt>
+            <dd class="col-sm-8">@Model.Inmueble?.Cupo personas</dd>
+
+            <dt class="col-sm-4">Precio por día</dt>
+            <dd class="col-sm-8">@Model.Inmueble?.PrecioDia.ToString("C")</dd>
+        </dl>
+    </div>
+</div>
+
+<hr />
+
+<h4>Datos de la Reserva</h4>
+<dl class="row">
+    <dt class="col-sm-3">Fecha Inicio</dt>
+    <dd class="col-sm-9">@Model.FechaIngreso.ToString("dd/MM/yyyy")</dd>
+
+    <dt class="col-sm-3">Fecha Fin</dt>
+    <dd class="col-sm-9">@Model.FechaEgreso.ToString("dd/MM/yyyy")</dd>
+
+    <dt class="col-sm-3">Monto Diario</dt>
+    <dd class="col-sm-9">@Model.MontoDia.ToString("C")</dd>
+
+    <dt class="col-sm-3">Fecha Cancelación</dt>
+    <dd class="col-sm-9">
+        @if (Model.FechaCancelacion is not null)
+        {
+            <span class="badge bg-danger">@Model.FechaCancelacion.Value.ToString("dd/MM/yyyy")</span>
+        }
+        else
+        {
+            <span class="text-muted">---</span>
+        }
+    </dd>
+</dl>
+
+<div class="mt-4">
+    <a asp-action="Edit" asp-route-id="@Model.IdReserva" class="btn btn-warning">Editar</a>
+
+    @if (Model.FechaCancelacion is null)
+    {
+        <a asp-action="Extender" asp-route-id="@Model.IdReserva" class="btn btn-primary">Extender Reserva</a>
+        <a asp-action="Cancelar" asp-route-id="@Model.IdReserva" class="btn btn-danger">Cancelar Reserva</a>
+    }
+
+    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+</div>

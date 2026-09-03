@@ -1,0 +1,88 @@
+@model IList<Agencia_inmobiliaria.Models.Reserva>
+
+@{
+    ViewData["Title"] = "Reservas";
+}
+
+<h1>Reservas</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nueva Reserva</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Inquilino</th>
+            <th>Inmueble</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Monto Diario</th>
+            <th>Fecha Cancelación</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Inquilino?.Nombre @item.Inquilino?.Apellido</td>
+                <td>@item.Inmueble?.Direccion</td>
+                <td>@item.FechaIngreso.ToString("dd/MM/yyyy")</td>
+                <td>@item.FechaEgreso.ToString("dd/MM/yyyy")</td>
+                <td>@item.MontoDia.ToString("C")</td>
+                <td>
+                    @if (item.FechaCancelacion is not null)
+                    {
+                        <span class="badge bg-danger">@item.FechaCancelacion.Value.ToString("dd/MM/yyyy")</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">---</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.IdReserva" class="btn btn-sm btn-info">Ver</a>
+                    <a asp-action="Edit" asp-route-id="@item.IdReserva" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.IdReserva" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No hay reservas cargadas.</p>
+}
+
+<!-- Paginación -->
+<nav>
+    <ul class="pagination">
+        @{
+            int paginaActual = ViewBag.PaginaActual is int p ? p : 1;
+            int totalPaginas = ViewBag.TotalPaginas is int t ? t : 1;
+        }
+
+        @if (paginaActual > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual - 1)">Anterior</a>
+            </li>
+        }
+
+        @for (int i = 1; i <= totalPaginas; i++)
+        {
+            <li class="page-item @(i == paginaActual ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pagina="@i">@i</a>
+            </li>
+        }
+
+        @if (paginaActual < totalPaginas)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual + 1)">Siguiente</a>
+            </li>
+        }
+    </ul>
+</nav>

@@ -1,0 +1,116 @@
+@model Agencia_inmobiliaria.Models.Reserva
+
+@{
+    ViewData["Title"] = "Nueva Reserva";
+}
+
+<h1>Nueva Reserva</h1>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+
+<form asp-action="Create" method="post" id="formReserva">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group mb-3">
+        <label asp-for="IdInquilino" class="control-label">Inquilino</label>
+        <select asp-for="IdInquilino" id="selectInquilino" class="form-control">
+            <option value="">-- Seleccione un inquilino --</option>
+            @foreach (var inq in (IEnumerable<Agencia_inmobiliaria.Models.Inquilino>)ViewBag.Inquilinos)
+            {
+                <option value="@inq.IdInquilino">@inq.Nombre @inq.Apellido - DNI @inq.Dni</option>
+            }
+        </select>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-6 mb-3">
+            <label asp-for="FechaIngreso" class="control-label">Fecha de Ingreso</label>
+            <input asp-for="FechaIngreso" type="date" class="form-control" id="fechaIngreso" />
+        </div>
+        <div class="form-group col-md-6 mb-3">
+            <label asp-for="FechaEgreso" class="control-label">Fecha de fin</label>
+            <input asp-for="FechaEgreso" type="date" class="form-control" id="fechaEgreso" />
+        </div>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="IdInmueble" class="control-label">Inmueble</label>
+        <select asp-for="IdInmueble" id="selectInmueble" class="form-control" disabled>
+            <option value="">-- Elegí las fechas primero --</option>
+        </select>
+        <small class="text-muted" id="mensajeInmuebles"></small>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="MontoDia" class="control-label">Monto por Dia</label>
+        <input asp-for="MontoDia" class="form-control" id="montoDia" readonly />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Reserva</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#selectInquilino').select2({
+                placeholder: "Buscar inquilino por nombre o DNI...",
+                width: '100%'
+            });
+
+            const fechaInicio = document.getElementById('fechaIngreso');
+            const fechaFin = document.getElementById('fechaEgreso');
+            const selectInmueble = $('#selectInmueble');
+            const mensaje = document.getElementById('mensajeInmuebles');
+            const montoDiario = document.getElementById('montoDia');
+
+            function buscarInmueblesDisponibles() {
+                const inicio = fechaIngreso.value;
+                const fin = fechaEgreso.value;
+
+                if (!inicio || !fin) {
+                    return;
+                }
+
+                if (fin <= inicio) {
+                    mensaje.textContent = "La fecha de fin debe ser posterior a la de inicio.";
+                    selectInmueble.prop('disabled', true);
+                    return;
+                }
+
+                mensaje.textContent = "Buscando inmuebles disponibles...";
+                selectInmueble.prop('disabled', true);
+
+                fetch(`/Inmueble/BuscarDisponibles?fechaIngreso=${inicio}&fechaEgreso=${fin}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        selectInmueble.empty();
+                        selectInmueble.append('<option value="">-- Seleccione un inmueble --</option>');
+
+                        if (data.length === 0) {
+                            mensaje.textContent = "No hay inmuebles disponibles en esas fechas.";
+                        } else {
+                            data.forEach(item => {
+                                selectInmueble.append(`<option value="${item.id}" data-precio="${item.precioDia}">${item.texto}</option>`);
+                            });
+                            mensaje.textContent = `${data.length} inmueble(s) disponible(s).`;
+                            selectInmueble.prop('disabled', false);
+                        }
+                        montoDiario.value = ""; 
+                    })
+                    .catch(() => {
+                        mensaje.textContent = "Error al buscar inmuebles. Intente nuevamente.";
+                    });
+            }
+
+            fechaInicio.addEventListener('change', buscarInmueblesDisponibles);
+            fechaFin.addEventListener('change', buscarInmueblesDisponibles);
+            selectInmueble.on('change', function () {
+                const opcionSeleccionada = $(this).find('option:selected');
+                const precio = opcionSeleccionada.data('precio');
+                montoDiario.value = precio ? precio : "";
+            });
+        });
+    </script>
+}

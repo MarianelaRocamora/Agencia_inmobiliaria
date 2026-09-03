@@ -1,0 +1,39 @@
+@model Agencia_inmobiliaria.Models.Reserva
+
+@{
+    ViewData["Title"] = "Eliminar Reserva";
+}
+
+<h1>Eliminar Reserva</h1>
+
+<h3>¿Estás seguro de que querés eliminar esta reserva?</h3>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Inquilino</dt>
+        <dd class="col-sm-9">@Model.Inquilino?.Nombre @Model.Inquilino?.Apellido</dd>
+
+        <dt class="col-sm-3">Inmueble</dt>
+        <dd class="col-sm-9">@Model.Inmueble?.Direccion</dd>
+
+        <dt class="col-sm-3">Fecha Inicio</dt>
+        <dd class="col-sm-9">@Model.FechaIngreso.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">Fecha Fin</dt>
+        <dd class="col-sm-9">@Model.FechaEgreso.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">Monto Diario</dt>
+        <dd class="col-sm-9">@Model.MontoDia.ToString("C")</dd>
+
+        <dt class="col-sm-3">Fecha Cancelación</dt>
+        <dd class="col-sm-9">
+            @(Model.FechaCancelacion is not null ? Model.FechaCancelacion.Value.ToString("dd/MM/yyyy") : "---")
+        </dd>
+    </dl>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="IdReserva" />
+    <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

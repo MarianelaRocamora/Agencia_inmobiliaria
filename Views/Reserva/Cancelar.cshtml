@@ -1,0 +1,46 @@
+@model Agencia_inmobiliaria.Models.Reserva
+
+@{
+    ViewData["Title"] = "Cancelar Reserva";
+}
+
+<h1>Cancelar Reserva</h1>
+
+<h3>¿Estás seguro de que querés cancelar esta reserva?</h3>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Inquilino</dt>
+        <dd class="col-sm-9">@Model.Inquilino?.Nombre @Model.Inquilino?.Apellido</dd>
+
+        <dt class="col-sm-3">Inmueble</dt>
+        <dd class="col-sm-9">@Model.Inmueble?.Direccion</dd>
+
+        <dt class="col-sm-3">Fecha Ingreso</dt>
+        <dd class="col-sm-9">@Model.FechaIngreso.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">Fecha Egreso (original)</dt>
+        <dd class="col-sm-9">@Model.FechaEgreso.ToString("dd/MM/yyyy")</dd>
+    </dl>
+</div>
+
+<form asp-action="Cancelar" method="post">
+    <input type="hidden" asp-for="IdReserva" />
+    <input type="hidden" asp-for="FechaIngreso" />
+    <input type="hidden" asp-for="FechaEgreso" />
+
+    <div class="form-group mb-3">
+        <label for="fechaCancelacion" class="control-label">Fecha real de finalización</label>
+        <input type="date" 
+               id="fechaCancelacion" 
+               name="fechaCancelacion" 
+               class="form-control" 
+               min="@Model.FechaIngreso.ToString("yyyy-MM-dd")" 
+               max="@Model.FechaEgreso.AddDays(-1).ToString("yyyy-MM-dd")" 
+               required />
+        <small class="text-muted">Debe ser una fecha entre el inicio y antes del fin original de la reserva.</small>
+    </div>
+
+    <button type="submit" class="btn btn-danger">Confirmar Cancelación</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</form>

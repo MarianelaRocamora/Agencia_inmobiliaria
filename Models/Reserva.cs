@@ -20,6 +20,8 @@ namespace Agencia_inmobiliaria.Models
 
         public int IdInmueble {get; set;}
         public int IdInquilino {get; set;}
+        public Inquilino? Inquilino { get; set; }
+        public Inmueble? Inmueble { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
