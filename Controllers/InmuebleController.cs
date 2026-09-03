@@ -203,5 +203,36 @@ namespace Agencia_inmobiliaria.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        // GET: Inmueble/BuscarDisponibles?fechaInicio=2026-09-10&fechaFin=2026-09-20
+        [HttpGet]
+        public IActionResult BuscarDisponibles(DateTime fechaIngreso, DateTime fechaEgreso, int? idReservaExcluir = null)
+        {
+            try
+            {
+                if (fechaEgreso <= fechaIngreso)
+                {
+                    return Json(new List<object>());
+                }
+
+                var disponibles = repositorio.ObtenerDisponiblesEntreFechas(fechaIngreso, fechaEgreso);
+
+                var resultado = new List<object>();
+                foreach (var i in disponibles)
+                {
+                     resultado.Add(new
+                    {
+                        id = i.IdInmueble,
+                        texto = $"{i.Direccion} ({i.TipoInmueble?.Nombre}) - Cupo: {i.Cupo} - ${i.PrecioDia}/día",
+                        precioDia = i.PrecioDia
+                    });
+                }
+
+                return Json(resultado);
+            }
+            catch (Exception)
+            {
+                return Json(new List<object>());
+            }
+        }
     }
 }

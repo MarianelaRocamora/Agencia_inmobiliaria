@@ -43,10 +43,11 @@ namespace Agencia_inmobiliaria.Models
         [Required(ErrorMessage = "El tipo de inmueble es obligatorio")]
         [Display(Name = "Tipo de Inmueble")]
         public int IdTipoInmueble {get; set;}
+        public TipoInmueble? TipoInmueble { get; set; } 
         [Required(ErrorMessage = "El propietario es obligatorio")]
         [Display(Name = "Propietario")]
         public int IdPropietario {get; set;}
-        
+        public Propietario? Propietario { get; set; }   
         public bool Estado { get; set;} = true;
     }
 }
