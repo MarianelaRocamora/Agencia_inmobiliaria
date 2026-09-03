@@ -9,23 +9,39 @@ namespace Agencia_inmobiliaria.Models
         public required string Direccion {get; set;}
 
         [Required(ErrorMessage =" El cupo es obligatorio")]
+        [Display(Name = "Cupo (personas)")]
         public  int Cupo {get; set;}
+
         [Required(ErrorMessage = "El precio por día es obligatorio")]
+        [Display(Name = "Precio por día")]
         public decimal PrecioDia {get; set;}
+
+
         [Required(ErrorMessage = "El porcentaje de reserva es obligatorio")]
+        [Display(Name = "Porcentaje de reserva (%)")]
         public decimal PorcentajeReserva {get; set;}
+
+
         [Required(ErrorMessage = "Las coordenadas son obligatorias")]
+        [Display(Name = "Latitud")]
         public decimal Latitud { get; set; }
         
         [Required(ErrorMessage = "Las coordenadas son obligatorias")]
-
+        [Display(Name = "Longitud")]
 		public decimal Longitud { get; set; }
 
+        [Display(Name = "Imagen de Portada")]
         public string? Portada {get; set;}
+        
+        [Display(Name = "Disponible")]
         public bool Disponible {get; set;} = true;
+        
+
         [Required(ErrorMessage = "El tipo de inmueble es obligatorio")]
+        [Display(Name = "Tipo de Inmueble")]
         public int IdTipoInmueble {get; set;}
         [Required(ErrorMessage = "El propietario es obligatorio")]
+        [Display(Name = "Propietario")]
         public int IdPropietario {get; set;}
         
         public bool Estado { get; set;} = true;
