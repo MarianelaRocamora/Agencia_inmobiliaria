@@ -1,0 +1,114 @@
+@model IEnumerable<Agencia_inmobiliaria.Models.Inmueble>
+
+@{
+    ViewData["Title"] = "Inmuebles";
+    int totalPaginas = Math.Max((int?)ViewBag.TotalPaginas ?? 1, 1);
+    int paginaActual = Math.Clamp((int?)ViewBag.PaginaActual ?? 1, 1, totalPaginas);
+    // Ventana de a lo sumo 5 números de página alrededor de la actual
+    int desde = Math.Max(1, Math.Min(paginaActual - 2, totalPaginas - 4));
+    int hasta = Math.Min(totalPaginas, desde + 4);
+}
+
+<h1>Inmuebles</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nuevo Inmueble</a>
+</p>
+
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger">@TempData["error"]</div>
+}
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success">@TempData["success"]</div>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Dirección</th>
+            <th>Cupo</th>
+            <th>Precio/día</th>
+            <th>% Reserva</th>
+            <th>Disponible</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Direccion</td>
+                <td>@item.Cupo</td>
+                <td>@item.PrecioDia.ToString("C")</td>
+                <td>@item.PorcentajeReserva %</td>
+                <td>
+                    @if (item.Disponible)
+                    {
+                        <span class="badge bg-success">Sí</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">No</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-info">Detalles</a>
+                    <a asp-action="Edit" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-secondary">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (totalPaginas > 1)
+{
+    <nav aria-label="Paginación de inmuebles">
+        <ul class="pagination justify-content-center">
+            @if (paginaActual > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pagina="1" title="Primera">&laquo;</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual - 1)" title="Anterior">&lsaquo;</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                <li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>
+            }
+
+            @for (int p = desde; p <= hasta; p++)
+            {
+                if (p == paginaActual)
+                {
+                    <li class="page-item active" aria-current="page"><span class="page-link">@p</span></li>
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-pagina="@p">@p</a></li>
+                }
+            }
+
+            @if (paginaActual < totalPaginas)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual + 1)" title="Siguiente">&rsaquo;</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pagina="@totalPaginas" title="Última">&raquo;</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
+                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+            }
+        </ul>
+    </nav>
+    <p class="text-center text-muted">Página @paginaActual de @totalPaginas</p>
+}

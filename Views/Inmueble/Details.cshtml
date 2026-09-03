@@ -1,0 +1,53 @@
+@model Agencia_inmobiliaria.Models.Inmueble
+
+@{
+    ViewData["Title"] = "Detalle del Inmueble";
+    var tipoInmueble = ViewBag.TipoInmueble as Agencia_inmobiliaria.Models.TipoInmueble;
+    var propietario = ViewBag.Propietario as Agencia_inmobiliaria.Models.Propietario;
+}
+
+<h1>Detalle del Inmueble</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Dirección</dt>
+    <dd class="col-sm-9">@Model.Direccion</dd>
+
+    <dt class="col-sm-3">Cupo</dt>
+    <dd class="col-sm-9">@Model.Cupo personas</dd>
+
+    <dt class="col-sm-3">Precio por día</dt>
+    <dd class="col-sm-9">@Model.PrecioDia.ToString("C")</dd>
+
+    <dt class="col-sm-3">% de reserva</dt>
+    <dd class="col-sm-9">@Model.PorcentajeReserva %</dd>
+
+    <dt class="col-sm-3">Coordenadas</dt>
+    <dd class="col-sm-9">@Model.Latitud, @Model.Longitud</dd>
+
+    <dt class="col-sm-3">Portada</dt>
+    <dd class="col-sm-9">
+        @if (!string.IsNullOrEmpty(Model.Portada))
+        {
+            <span>@Model.Portada</span>
+        }
+        else
+        {
+            <span class="text-muted">Sin imagen cargada</span>
+        }
+    </dd>
+
+    <dt class="col-sm-3">Disponible</dt>
+    <dd class="col-sm-9">@(Model.Disponible ? "Sí" : "No")</dd>
+
+    <dt class="col-sm-3">Tipo de inmueble</dt>
+    <dd class="col-sm-9">@(tipoInmueble?.Nombre ?? "-")</dd>
+
+    <dt class="col-sm-3">Propietario</dt>
+    <dd class="col-sm-9">@(propietario != null ? $"{propietario.Apellido}, {propietario.Nombre}" : "-")</dd>
+
+    <dt class="col-sm-3">Estado</dt>
+    <dd class="col-sm-9">@(Model.Estado ? "Activo" : "Inactivo")</dd>
+</dl>
+
+<a asp-action="Edit" asp-route-id="@Model.IdInmueble" class="btn btn-secondary">Editar</a>
+<a asp-action="Index" class="btn btn-outline-secondary">Volver al listado</a>
