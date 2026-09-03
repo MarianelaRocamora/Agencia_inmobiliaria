@@ -27,7 +27,7 @@ namespace Agencia_inmobiliaria.Controllers
 
             ViewBag.TiposInmueble = new SelectList(tipos, "IdTipoInmueble", "Nombre", inmueble?.IdTipoInmueble);
             ViewBag.Propietarios = new SelectList(
-                propietarios.Select(p => new { p.IdPropietario, NombreCompleto = p.Apellido + ", " + p.Nombre }),
+                propietarios.Select(p => new { p.IdPropietario, NombreCompleto = $"{p.Apellido}, {p.Nombre} - DNI: {p.Dni}" }),
                 "IdPropietario", "NombreCompleto", inmueble?.IdPropietario);
         }
 

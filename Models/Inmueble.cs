@@ -9,15 +9,18 @@ namespace Agencia_inmobiliaria.Models
         public required string Direccion {get; set;}
 
         [Required(ErrorMessage =" El cupo es obligatorio")]
+        [Range(1, 50, ErrorMessage = "El cupo debe estar entre 1 y 50 personas")]
         [Display(Name = "Cupo (personas)")]
         public  int Cupo {get; set;}
 
         [Required(ErrorMessage = "El precio por día es obligatorio")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "El precio por día debe ser mayor a 0")]
         [Display(Name = "Precio por día")]
         public decimal PrecioDia {get; set;}
 
 
         [Required(ErrorMessage = "El porcentaje de reserva es obligatorio")]
+        [Range(0, 100, ErrorMessage = "El porcentaje de reserva debe estar entre 0 y 100")]
         [Display(Name = "Porcentaje de reserva (%)")]
         public decimal PorcentajeReserva {get; set;}
 

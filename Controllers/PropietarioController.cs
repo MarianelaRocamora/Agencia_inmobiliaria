@@ -150,9 +150,29 @@ namespace Agencia_inmobiliaria.Controllers
             }
             catch (Exception)
             {
-                TempData["error"] = "No se pudo eliminar el inquilino. Intente nuevamente.";
+                TempData["error"] = "No se pudo eliminar el propietario. Intente nuevamente.";
             }
             return RedirectToAction(nameof(Index));
         }
+
+         // GET: /Propietario/Buscar?term=xxx
+        // Devuelve coincidencias por nombre, apellido o DNI para usar en combos con búsqueda del lado del servidor.
+        [HttpGet]
+        public JsonResult Buscar(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term) || term.Length < 2)
+            {
+                return Json(new List<object>());
+            }
+ 
+            var resultados = repositorio.Buscar(term)
+                .Select(p => new
+                {
+                    id = p.IdPropietario,
+                    texto = $"{p.Apellido}, {p.Nombre} (DNI {p.Dni})"
+                });
+ 
+            return Json(resultados);
+        }  
     }
 }

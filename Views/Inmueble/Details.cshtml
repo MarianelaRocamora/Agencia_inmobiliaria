@@ -43,7 +43,7 @@
     <dd class="col-sm-9">@(tipoInmueble?.Nombre ?? "-")</dd>
 
     <dt class="col-sm-3">Propietario</dt>
-    <dd class="col-sm-9">@(propietario != null ? $"{propietario.Apellido}, {propietario.Nombre}" : "-")</dd>
+    <dd class="col-sm-9">@(propietario != null ? $"{propietario.Nombre}, {propietario.Apellido} , {propietario.Dni}" : "-")</dd>
 
     <dt class="col-sm-3">Estado</dt>
     <dd class="col-sm-9">@(Model.Estado ? "Activo" : "Inactivo")</dd>

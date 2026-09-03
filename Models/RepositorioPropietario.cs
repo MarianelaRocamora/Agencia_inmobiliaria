@@ -169,5 +169,43 @@ namespace Agencia_inmobiliaria.Models
 
             return propietario;
         }
+
+        public IList<Propietario> Buscar(string texto)
+        {
+            var lista = new List<Propietario>();
+            string sql = @"SELECT ID_propietario, nombre, apellido, dni, telefono, email, direccion, estado
+                            FROM propietario
+                            WHERE estado = 1
+                              AND (nombre LIKE @texto OR apellido LIKE @texto OR dni LIKE @texto)
+                            ORDER BY apellido, nombre
+                            LIMIT 20";
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                var command = new MySqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@texto", "%" + texto + "%");
+
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new Propietario
+                        {
+                            IdPropietario = reader.GetInt32("ID_propietario"),
+                            Nombre = reader.GetString("nombre"),
+                            Apellido = reader.GetString("apellido"),
+                            Dni = reader.GetString("dni"),
+                            Telefono = reader.GetString("telefono"),
+                            Email = reader.GetString("email"),
+                            Direccion = reader.GetString("direccion"),
+                            Estado = reader.GetBoolean("estado")
+                        });
+                    }
+                }
+            }
+
+            return lista;
+        }
     }
 }

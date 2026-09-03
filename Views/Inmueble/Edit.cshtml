@@ -32,14 +32,20 @@
         <span asp-validation-for="PorcentajeReserva" class="text-danger"></span>
     </div>
     <div class="form-group mb-2">
-        <label asp-for="Latitud" class="form-label"></label>
-        <input asp-for="Latitud" class="form-control" />
-        <span asp-validation-for="Latitud" class="text-danger"></span>
+        <label class="form-label">Ubicación (hacé clic en el mapa para cambiar el punto)</label>
+        <div id="mapa" style="height: 350px; width: 100%; border: 1px solid #ccc; border-radius: 4px;"></div>
     </div>
-    <div class="form-group mb-2">
-        <label asp-for="Longitud" class="form-label"></label>
-        <input asp-for="Longitud" class="form-control" />
-        <span asp-validation-for="Longitud" class="text-danger"></span>
+    <div class="row mb-2">
+        <div class="col-md-6">
+            <label asp-for="Latitud" class="form-label"></label>
+            <input asp-for="Latitud" class="form-control" readonly />
+            <span asp-validation-for="Latitud" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Longitud" class="form-label"></label>
+            <input asp-for="Longitud" class="form-control" readonly />
+            <span asp-validation-for="Longitud" class="text-danger"></span>
+        </div>
     </div>
     <div class="form-group mb-2">
         <label asp-for="Portada" class="form-label"></label>
@@ -69,6 +75,40 @@
     <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
 </form>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"
+      integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
+            integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        (function () {
+            const inputLat = document.getElementById('Latitud');
+            const inputLng = document.getElementById('Longitud');
+
+            // Coordenadas iniciales .
+            const latInicial = parseFloat(inputLat.value) || -33.295;
+            const lngInicial = parseFloat(inputLng.value) || -66.335;
+
+            const map = L.map('mapa').setView([latInicial, lngInicial], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            let marker = L.marker([latInicial, lngInicial]).addTo(map);
+
+            function ubicarMarcador(lat, lng) {
+                marker.setLatLng([lat, lng]);
+                inputLat.value = lat.toFixed(6);
+                inputLng.value = lng.toFixed(6);
+            }
+
+            map.on('click', function (e) {
+                ubicarMarcador(e.latlng.lat, e.latlng.lng);
+            });
+        })();
+    </script>
 }
