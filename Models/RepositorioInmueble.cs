@@ -208,8 +208,8 @@ namespace Agencia_inmobiliaria.Models
                                  WHERE r.ID_inmueble = inm.ID_inmueble
                                    AND r.estado = 1
                                    AND r.fecha_cancelacion IS NULL
-                                   AND r.fecha_ingreso < @fechaIngreso
-                                   AND r.fecha_egreso > @fechaEgreso
+                                   AND r.fecha_ingreso < @fechaEgreso
+                                   AND r.fecha_egreso > @fechaIngreso
                                    AND (@idReservaExcluir IS NULL OR r.ID_reserva <> @idReservaExcluir)
                              )
                            ORDER BY inm.direccion";
