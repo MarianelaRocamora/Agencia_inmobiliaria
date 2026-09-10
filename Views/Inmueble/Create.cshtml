@@ -49,6 +49,8 @@
         <label for="archivoPortada" class="control-label">Imagen de Portada</label>
         <input type="file" name="archivoPortada" id="archivoPortada" class="form-control" accept="image/*" />
         <span asp-validation-for="Portada" class="text-danger"></span>
+        <br />
+        <img id="preview-imagen" src="" alt="Vista previa" style="max-width: 300px; display: none;">
     </div>
     <div class="form-group mb-2">
         <label asp-for="IdTipoInmueble" class="form-label"></label>
@@ -107,5 +109,21 @@
                 ubicarMarcador(e.latlng.lat, e.latlng.lng);
             });
         })();
+    </script>
+    <script>
+        const inputImagen = document.getElementById('archivoPortada');
+        const previewImagen = document.getElementById('preview-imagen');
+
+        inputImagen.addEventListener('change', (evento) => {
+          const archivo = evento.target.files[0];
+
+          if (archivo) {
+            previewImagen.src = URL.createObjectURL(archivo);
+            previewImagen.style.display = 'block';
+          } else {
+            previewImagen.src = '';
+            previewImagen.style.display = 'none';
+          }
+        });
     </script>
 }
