@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Agencia_inmobiliaria.Models;
-
 namespace Agencia_inmobiliaria.Controllers
 {
     public class InmuebleController : Controller
@@ -90,7 +89,7 @@ namespace Agencia_inmobiliaria.Controllers
         // POST inmuebles/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Inmueble inmueble)
+        public IActionResult Create(Inmueble inmueble, [FromServices] IWebHostEnvironment environment, IFormFile? archivoPortada)
         {
             if (!ModelState.IsValid)
             {
@@ -101,6 +100,11 @@ namespace Agencia_inmobiliaria.Controllers
             try
             {
                 inmueble.Estado = true;
+                if (archivoPortada != null)
+                {
+                    inmueble.Portada = GuardarPortada(archivoPortada, environment);
+                }
+
                 repositorio.Alta(inmueble);
                 TempData["success"] = "Inmueble creado exitosamente";
                 return RedirectToAction(nameof(Index));
@@ -136,7 +140,7 @@ namespace Agencia_inmobiliaria.Controllers
         // POST inmuebles/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Inmueble inmueble)
+        public IActionResult Edit(int id, Inmueble inmueble, [FromServices] IWebHostEnvironment environment, IFormFile? archivoPortada)
         {
             if (!ModelState.IsValid)
             {
@@ -147,6 +151,29 @@ namespace Agencia_inmobiliaria.Controllers
             try
             {
                 inmueble.IdInmueble = id;
+                var inmuebleActual = repositorio.ObtenerPorId(id);
+                if (inmuebleActual == null)
+                {
+                    TempData["error"] = "El inmueble no existe.";
+                    return RedirectToAction(nameof(Index));
+                }
+                if (archivoPortada != null)
+                {
+                    if (inmuebleActual.Portada is not null)
+                    {
+                        string rutaFisica = Path.Combine(environment.WebRootPath, inmuebleActual.Portada.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString()));
+
+                    if (System.IO.File.Exists(rutaFisica))
+                    {
+                        System.IO.File.Delete(rutaFisica);
+                    }
+                    }
+                    inmueble.Portada = GuardarPortada(archivoPortada, environment);
+                }
+                else
+                {
+                    inmueble.Portada = inmuebleActual?.Portada;
+                }
 
                 int filasAfectadas = repositorio.Modificacion(inmueble);
                 if (filasAfectadas > 0)
@@ -233,6 +260,27 @@ namespace Agencia_inmobiliaria.Controllers
             {
                 return Json(new List<object>());
             }
+        }
+
+        private string GuardarPortada(IFormFile archivo, [FromServices] IWebHostEnvironment environment)
+        {
+            string wwwPath = environment.WebRootPath;
+            string path = Path.Combine(wwwPath, "Uploads", "Inmuebles", "Portadas");
+        
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+        
+            string fileName = "portada_" + Guid.NewGuid() + Path.GetExtension(archivo.FileName);
+            string rutaFisicaCompleta = Path.Combine(path, fileName);
+        
+            using (var stream = new FileStream(rutaFisicaCompleta, FileMode.Create))
+            {
+                archivo.CopyTo(stream);
+            }
+        
+            return Path.Combine("/Uploads/Inmuebles", fileName).Replace("\\", "/");
         }
     }
 }
