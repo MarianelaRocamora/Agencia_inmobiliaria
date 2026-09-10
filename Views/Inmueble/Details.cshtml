@@ -28,7 +28,7 @@
     <dd class="col-sm-9">
         @if (!string.IsNullOrEmpty(Model.Portada))
         {
-            <span>@Model.Portada</span>
+            <img id="portada-@Model.IdInmueble" src="@Model.Portada" alt="Portada" style="max-width: 300px;">
         }
         else
         {
