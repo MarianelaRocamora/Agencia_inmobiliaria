@@ -13,7 +13,7 @@ namespace Agencia_inmobiliaria.Models
         {
             int id = 0;
             string sql = @"INSERT INTO imagen (url, ID_inmueble, estado)
-                           VALUES(@url, @IdInmueble, estado);
+                           VALUES(@url, @IdInmueble, @estado);
                            SELECT LAST_INSERT_ID();";
             using (var connection = new MySqlConnection(connectionString))
             {

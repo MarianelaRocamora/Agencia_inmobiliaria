@@ -4,50 +4,85 @@
     ViewData["Title"] = "Detalle del Inmueble";
     var tipoInmueble = ViewBag.TipoInmueble as Agencia_inmobiliaria.Models.TipoInmueble;
     var propietario = ViewBag.Propietario as Agencia_inmobiliaria.Models.Propietario;
+    var imagenes = ViewBag.Imagenes as IList<Agencia_inmobiliaria.Models.Imagen>;
 }
 
 <h1>Detalle del Inmueble</h1>
+<div class="row">
+    <div class="col-md-8">
+        <dl class="row">
+            <dt class="col-sm-3">Dirección</dt>
+            <dd class="col-sm-9">@Model.Direccion</dd>
 
-<dl class="row">
-    <dt class="col-sm-3">Dirección</dt>
-    <dd class="col-sm-9">@Model.Direccion</dd>
+            <dt class="col-sm-3">Cupo</dt>
+            <dd class="col-sm-9">@Model.Cupo personas</dd>
 
-    <dt class="col-sm-3">Cupo</dt>
-    <dd class="col-sm-9">@Model.Cupo personas</dd>
+            <dt class="col-sm-3">Precio por día</dt>
+            <dd class="col-sm-9">@Model.PrecioDia.ToString("C")</dd>
 
-    <dt class="col-sm-3">Precio por día</dt>
-    <dd class="col-sm-9">@Model.PrecioDia.ToString("C")</dd>
+            <dt class="col-sm-3">% de reserva</dt>
+            <dd class="col-sm-9">@Model.PorcentajeReserva %</dd>
 
-    <dt class="col-sm-3">% de reserva</dt>
-    <dd class="col-sm-9">@Model.PorcentajeReserva %</dd>
+            <dt class="col-sm-3">Coordenadas</dt>
+            <dd class="col-sm-9">@Model.Latitud, @Model.Longitud</dd>
 
-    <dt class="col-sm-3">Coordenadas</dt>
-    <dd class="col-sm-9">@Model.Latitud, @Model.Longitud</dd>
+            <dt class="col-sm-3">Portada</dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrEmpty(Model.Portada))
+                {
+                    <img id="portada-@Model.IdInmueble" src="@Model.Portada" alt="Portada" style="max-width: 300px;">
+                }
+                else
+                {
+                    <span class="text-muted">Sin imagen cargada</span>
+                }
+            </dd>
 
-    <dt class="col-sm-3">Portada</dt>
-    <dd class="col-sm-9">
-        @if (!string.IsNullOrEmpty(Model.Portada))
+            <dt class="col-sm-3">Disponible</dt>
+            <dd class="col-sm-9">@(Model.Disponible ? "Sí" : "No")</dd>
+
+            <dt class="col-sm-3">Tipo de inmueble</dt>
+            <dd class="col-sm-9">@(tipoInmueble?.Nombre ?? "-")</dd>
+
+            <dt class="col-sm-3">Propietario</dt>
+            <dd class="col-sm-9">@(propietario != null ? $"{propietario.Nombre}, {propietario.Apellido} , {propietario.Dni}" : "-")</dd>
+
+            <dt class="col-sm-3">Estado</dt>
+            <dd class="col-sm-9">@(Model.Estado ? "Activo" : "Inactivo")</dd>
+        </dl>
+    </div>
+    <div class="col-md-4">
+        <h5>Imágenes adicionales</h5>
+        @if (imagenes != null && imagenes.Any())
         {
-            <img id="portada-@Model.IdInmueble" src="@Model.Portada" alt="Portada" style="max-width: 300px;">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+            @foreach (var img in imagenes)
+            {
+                <div class="position-relative">
+                    <img src="@img.Url" alt="Imagen adicional" style="width: 100px; height: 100px; object-fit: cover; border-radius: 6px;">
+                    <form asp-controller="Imagen" asp-action="Eliminar" method="post" class="position-absolute top-0 end-0">
+                        <input type="hidden" name="id" value="@img.IdImagen" />
+                        <input type="hidden" name="idInmueble" value="@Model.IdInmueble" />
+                        <button type="submit" class="btn btn-sm btn-danger" style="padding: 0 6px; line-height: 1;" title="Eliminar imagen">×</button>
+                    </form>
+                </div>
+            }
+            </div>
         }
         else
         {
-            <span class="text-muted">Sin imagen cargada</span>
+            <p class="text-muted">Sin imágenes adicionales.</p>
         }
-    </dd>
-
-    <dt class="col-sm-3">Disponible</dt>
-    <dd class="col-sm-9">@(Model.Disponible ? "Sí" : "No")</dd>
-
-    <dt class="col-sm-3">Tipo de inmueble</dt>
-    <dd class="col-sm-9">@(tipoInmueble?.Nombre ?? "-")</dd>
-
-    <dt class="col-sm-3">Propietario</dt>
-    <dd class="col-sm-9">@(propietario != null ? $"{propietario.Nombre}, {propietario.Apellido} , {propietario.Dni}" : "-")</dd>
-
-    <dt class="col-sm-3">Estado</dt>
-    <dd class="col-sm-9">@(Model.Estado ? "Activo" : "Inactivo")</dd>
-</dl>
+        <br />
+        <form asp-controller="Imagen" asp-action="Alta" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="@Model.IdInmueble" />
+        <div class="input-group">
+            <input type="file" name="imagenes" class="form-control" accept="image/*" multiple required />
+            <button type="submit" class="btn btn-primary">Agregar</button>
+        </div>
+    </form>
+    </div>
+</div>
 
 <a asp-action="Edit" asp-route-id="@Model.IdInmueble" class="btn btn-secondary">Editar</a>
 <a asp-action="Index" class="btn btn-outline-secondary">Volver al listado</a>

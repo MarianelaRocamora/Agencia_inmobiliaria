@@ -8,15 +8,18 @@ namespace Agencia_inmobiliaria.Controllers
         private readonly IRepositorioInmueble repositorio;
         private readonly IRepositorioTipoInmueble repositorioTipoInmueble;
         private readonly IRepositorioPropietario repositorioPropietario;
+        private readonly IRepositorioImagen repositorioImagen;
 
         public InmuebleController(
             IRepositorioInmueble repositorio,
             IRepositorioTipoInmueble repositorioTipoInmueble,
-            IRepositorioPropietario repositorioPropietario)
+            IRepositorioPropietario repositorioPropietario,
+            IRepositorioImagen repositorioImagen)
         {
             this.repositorio = repositorio;
             this.repositorioTipoInmueble = repositorioTipoInmueble;
             this.repositorioPropietario = repositorioPropietario;
+            this.repositorioImagen = repositorioImagen;
         }
 
         private void CargarCombos(Inmueble? inmueble = null)
@@ -69,6 +72,7 @@ namespace Agencia_inmobiliaria.Controllers
 
                 ViewBag.TipoInmueble = repositorioTipoInmueble.ObtenerPorId(inmueble.IdTipoInmueble);
                 ViewBag.Propietario = repositorioPropietario.ObtenerPorId(inmueble.IdPropietario);
+                ViewBag.Imagenes = repositorioImagen.BuscarPorInmueble(inmueble.IdInmueble);
 
                 return View(inmueble);
             }
