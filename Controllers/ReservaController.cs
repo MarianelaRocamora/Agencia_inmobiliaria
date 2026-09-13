@@ -367,5 +367,73 @@ namespace Agencia_inmobiliaria.Controllers
                 return View(reserva);
             }
         }
+
+        [HttpGet]
+        public IActionResult Vigentes(int pagina = 1)
+        {
+            try
+            {
+                int tamPagina = 10;
+                pagina = Math.Max(pagina, 1);
+
+                var lista = repositorio.ObtenerVigentes(pagina, tamPagina);
+                int totalRegistros = repositorio.ObtenerCantidadVigentes();
+                int totalPaginas = totalRegistros == 0
+                    ? 1
+                    : (totalRegistros % tamPagina == 0 ? totalRegistros / tamPagina : totalRegistros / tamPagina + 1);
+
+                var datos = lista.Select(r => new
+                {
+                    id = r.IdReserva,
+                    inquilino = $"{r.Inquilino?.Nombre} {r.Inquilino?.Apellido}",
+                    inmueble = r.Inmueble?.Direccion,
+                    fechaInicio = r.FechaIngreso.ToString("dd/MM/yyyy"),
+                    fechaFin = r.FechaEgreso.ToString("dd/MM/yyyy"),
+                    montoDiario = r.MontoDia.ToString("C"),
+                    fechaCancelacion = r.FechaCancelacion?.ToString("dd/MM/yyyy")
+                });
+
+                return Json(new { reservas = datos, paginaActual = pagina, totalPaginas });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al obtener las reservas vigentes");
+                return Json(new { reservas = new List<object>(), paginaActual = 1, totalPaginas = 1 });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult TerminanEn(int dias = 7, int pagina = 1)
+        {
+            try
+            {
+                int tamPagina = 10;
+                pagina = Math.Max(pagina, 1);
+                dias = Math.Max(dias, 1);
+
+                var lista = repositorio.ObtenerQueTerminanEn(dias, pagina, tamPagina);
+                int totalRegistros = repositorio.ObtenerCantidadQueTerminanEn(dias);
+                int totalPaginas = totalRegistros == 0
+                    ? 1
+                    : (totalRegistros % tamPagina == 0 ? totalRegistros / tamPagina : totalRegistros / tamPagina + 1);
+
+                var datos = lista.Select(r => new
+                {
+                    id = r.IdReserva,
+                    inquilino = $"{r.Inquilino?.Nombre} {r.Inquilino?.Apellido}",
+                    inmueble = r.Inmueble?.Direccion,
+                    fechaInicio = r.FechaIngreso.ToString("dd/MM/yyyy"),
+                    fechaFin = r.FechaEgreso.ToString("dd/MM/yyyy"),
+                    montoDiario = r.MontoDia.ToString("C")
+                });
+
+                return Json(new { reservas = datos, paginaActual = pagina, totalPaginas });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al obtener reservas que terminan en {Dias} días", dias);
+                return Json(new { reservas = new List<object>(), paginaActual = 1, totalPaginas = 1 });
+            }
+        }
     }
 }

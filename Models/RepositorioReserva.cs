@@ -241,5 +241,192 @@ namespace Agencia_inmobiliaria.Models
 
             return reserva;
         }
+
+        public IList<Reserva> ObtenerVigentes(int paginaNro = 1, int tamPagina = 10)
+        {
+            if (paginaNro < 1) paginaNro = 1;
+            if (tamPagina < 1) tamPagina = 10;
+
+            var lista = new List<Reserva>();
+
+            string sql = @"SELECT
+                                r.ID_reserva, r.fecha_ingreso, r.fecha_egreso, r.monto_dia, r.ID_inmueble, r.ID_inquilino, r.fecha_cancelacion, r.estado,
+                                i.nombre AS inq_nombre,
+                                i.apellido AS inq_apellido,
+                                i.dni AS inq_dni,
+                                i.telefono,
+                                i.email,
+                                i.direccion AS inq_direccion,
+                                inm.direccion AS inm_direccion,
+                                inm.precio_dia AS inm_precioDia
+                            FROM
+                                reserva r
+                            JOIN inquilino i ON
+                                r.ID_inquilino = i.ID_inquilino
+                            JOIN inmueble inm ON
+                                r.ID_inmueble = inm.ID_inmueble
+                            WHERE
+                                r.estado = 1
+                                AND r.fecha_ingreso <= CURDATE()
+                                AND COALESCE(r.fecha_cancelacion, r.fecha_egreso) >= CURDATE()
+                            ORDER BY
+                                ID_reserva
+                            LIMIT @tamPagina OFFSET @offset";
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                var command = new MySqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@tamPagina", tamPagina);
+                command.Parameters.AddWithValue("@offset", (paginaNro - 1) * tamPagina);
+
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new Reserva
+                        {
+                            IdReserva = reader.GetInt32("ID_reserva"),
+                            FechaIngreso = reader.GetDateTime("fecha_ingreso"),
+                            FechaEgreso = reader.GetDateTime("fecha_egreso"),
+                            MontoDia = reader.GetDouble("monto_dia"),
+                            IdInmueble = reader.GetInt32("ID_inmueble"),
+                            IdInquilino = reader.GetInt32("ID_inquilino"),
+                            FechaCancelacion = reader.IsDBNull(reader.GetOrdinal("fecha_cancelacion"))
+                                               ? (DateTime?)null
+                                               : reader.GetDateTime("fecha_cancelacion"),
+                            Estado = reader.GetBoolean("estado"),
+                             Inquilino = new Inquilino
+                            {
+                                IdInquilino = reader.GetInt32("ID_inquilino"),
+                                Nombre = reader.GetString("inq_nombre"),
+                                Apellido = reader.GetString("inq_apellido"),
+                                Dni = reader.GetString("inq_dni"),
+                                Telefono = reader.GetString("telefono"),
+                                Email = reader.GetString("email"),
+                                Direccion = reader.GetString("inq_direccion")
+                            },
+                            Inmueble = new Inmueble
+                            {
+                                IdInmueble = reader.GetInt32("ID_inmueble"),
+                                Direccion = reader.GetString("inm_direccion"),
+                                PrecioDia = reader.GetDecimal("inm_precioDia")
+                            }
+                        });
+                    }
+                }
+            }
+
+            return lista;
+
+        }
+        public int ObtenerCantidadVigentes()
+        {
+            int cantidad = 0;
+            string sql = @"SELECT COUNT(*) FROM reserva 
+                        WHERE estado = 1
+                            AND fecha_ingreso <= CURDATE()
+                            AND COALESCE(fecha_cancelacion, fecha_egreso) >= CURDATE()";
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                var command = new MySqlCommand(sql, connection);
+                connection.Open();
+                cantidad = Convert.ToInt32(command.ExecuteScalar());
+            }
+
+            return cantidad;
+        }
+
+        public IList<Reserva> ObtenerQueTerminanEn(int cantidadDias, int paginaNro = 1, int tamPagina = 10)
+        {
+            var lista = new List<Reserva>();
+            string sql = @"SELECT 
+                            r.ID_reserva, r.fecha_ingreso, r.fecha_egreso, r.monto_dia, r.ID_inmueble, r.ID_inquilino, r.fecha_cancelacion, r.estado,
+                                i.nombre AS inq_nombre,
+                                i.apellido AS inq_apellido,
+                                i.dni AS inq_dni,
+                                i.telefono,
+                                i.email,
+                                i.direccion AS inq_direccion,
+                                inm.direccion AS inm_direccion,
+                                inm.precio_dia AS inm_precioDia
+                            FROM
+                                reserva r
+                            JOIN inquilino i ON
+                                r.ID_inquilino = i.ID_inquilino
+                            JOIN inmueble inm ON
+                                r.ID_inmueble = inm.ID_inmueble
+                           WHERE r.estado = 1
+                             AND COALESCE(r.fecha_cancelacion, r.fecha_egreso) BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL @cantidadDias DAY)
+                            ORDER BY COALESCE(r.fecha_cancelacion, r.fecha_egreso)
+                           LIMIT @tamPagina OFFSET @offset";
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                var command = new MySqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@cantidadDias", cantidadDias);
+                command.Parameters.AddWithValue("@tamPagina", tamPagina);
+                command.Parameters.AddWithValue("@offset", (paginaNro - 1) * tamPagina);
+
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new Reserva
+                        {
+                            IdReserva = reader.GetInt32("ID_reserva"),
+                            FechaIngreso = reader.GetDateTime("fecha_ingreso"),
+                            FechaEgreso = reader.GetDateTime("fecha_egreso"),
+                            MontoDia = reader.GetDouble("monto_dia"),
+                            IdInmueble = reader.GetInt32("ID_inmueble"),
+                            IdInquilino = reader.GetInt32("ID_inquilino"),
+                            FechaCancelacion = reader.IsDBNull(reader.GetOrdinal("fecha_cancelacion"))
+                                               ? (DateTime?)null
+                                               : reader.GetDateTime("fecha_cancelacion"),
+                            Estado = reader.GetBoolean("estado"),
+                             Inquilino = new Inquilino
+                            {
+                                IdInquilino = reader.GetInt32("ID_inquilino"),
+                                Nombre = reader.GetString("inq_nombre"),
+                                Apellido = reader.GetString("inq_apellido"),
+                                Dni = reader.GetString("inq_dni"),
+                                Telefono = reader.GetString("telefono"),
+                                Email = reader.GetString("email"),
+                                Direccion = reader.GetString("inq_direccion")
+                            },
+                            Inmueble = new Inmueble
+                            {
+                                IdInmueble = reader.GetInt32("ID_inmueble"),
+                                Direccion = reader.GetString("inm_direccion"),
+                                PrecioDia = reader.GetDecimal("inm_precioDia")
+                            }
+                        });
+                    }
+                }
+            }
+
+            return lista;
+        }
+
+        public int ObtenerCantidadQueTerminanEn(int cantidadDias)
+        {
+            int cantidad = 0;
+            string sql = @"SELECT COUNT(*) FROM reserva 
+                           WHERE estado = 1
+                           AND COALESCE(fecha_cancelacion, fecha_egreso) BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL @cantidadDias DAY)";
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                var command = new MySqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@cantidadDias", cantidadDias);
+
+                connection.Open();
+                cantidad = Convert.ToInt32(command.ExecuteScalar());
+            }
+
+            return cantidad;
+        }
     }
 }

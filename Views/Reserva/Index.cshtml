@@ -6,9 +6,20 @@
 
 <h1>Reservas</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Nueva Reserva</a>
-</p>
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+    <a as-action="Create" class="btn btn-primary">Nueva Reserva</a>
+    <div class="d-flex align-items-center gap-2">
+        <label for="filtro" class="mb-0">Mostrar:</label>
+        <select id="filtro" class="form-select" style="width: auto;">
+            <option value="todas" selected>Todas</option>
+            <option value="vigentes">Vigentes</option>
+            <option value="terminanEn">Terminan en...</option>
+        </select>
+        <input type="number" id="inputDias" class="form-control" style="width: 80px; display: none;" value="7" min="1" />
+        <span id="labelDias" style="display: none;">días</span>
+    </div>
+</div>
 
 <table class="table">
     <thead>
@@ -22,7 +33,7 @@
             <th></th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="cuerpoTabla">
         @foreach (var item in Model)
         {
             <tr>
@@ -57,7 +68,7 @@
 }
 
 <!-- Paginación -->
-<nav>
+<nav id="paginacionNormal">
     <ul class="pagination">
         @{
             int paginaActual = ViewBag.PaginaActual is int p ? p : 1;
@@ -86,3 +97,143 @@
         }
     </ul>
 </nav>
+
+<nav id="paginacionVigentes" style="display: none;">
+    <ul class="pagination"></ul>
+</nav>
+
+@section Scripts {
+    <script>
+        const filtroSelect = document.getElementById('filtro');
+        const cuerpoTabla = document.getElementById('cuerpoTabla');
+        const paginacionNormal = document.getElementById('paginacionNormal');
+        const paginacionVigentes = document.getElementById('paginacionVigentes');
+
+        function cargarVigentes(pagina = 1) {
+            fetch(`/Reserva/Vigentes?pagina=${pagina}`)
+                .then(response => response.json())
+                .then(data => {
+                    cuerpoTabla.innerHTML = '';
+
+                    if (data.reservas.length === 0) {
+                        cuerpoTabla.innerHTML = '<tr><td colspan="7" class="text-muted text-center">No hay reservas vigentes.</td></tr>';
+                    } else {
+                        data.reservas.forEach(r => {
+                            const cancelacion = r.fechaCancelacion
+                                ? `<span class="badge bg-danger">${r.fechaCancelacion}</span>`
+                                : '<span class="text-muted">---</span>';
+
+                            cuerpoTabla.innerHTML += `
+                                <tr>
+                                    <td>${r.inquilino}</td>
+                                    <td>${r.inmueble}</td>
+                                    <td>${r.fechaInicio}</td>
+                                    <td>${r.fechaFin}</td>
+                                    <td>${r.montoDiario}</td>
+                                    <td>${cancelacion}</td>
+                                    <td class="text-end">
+                                        <a href="/Reserva/Details/${r.id}" class="btn btn-sm btn-info">Ver</a>
+                                        <a href="/Reserva/Edit/${r.id}" class="btn btn-sm btn-warning">Editar</a>
+                                        <a href="/Reserva/Delete/${r.id}" class="btn btn-sm btn-danger">Eliminar</a>
+                                    </td>
+                                </tr>`;
+                        });
+                    }
+
+                    renderizarPaginacionVigentes(data.paginaActual, data.totalPaginas);
+                })
+                .catch(() => {
+                    cuerpoTabla.innerHTML = '<tr><td colspan="7" class="text-danger text-center">Error al cargar las reservas vigentes.</td></tr>';
+                });
+        }
+
+        function renderizarPaginacionVigentes(paginaActual, totalPaginas) {
+            const ul = paginacionVigentes.querySelector('ul');
+            let html = '';
+
+            if (paginaActual > 1) {
+                html += `<li class="page-item"><a class="page-link" href="#" data-pagina="${paginaActual - 1}">Anterior</a></li>`;
+            }
+
+            for (let i = 1; i <= totalPaginas; i++) {
+                html += `<li class="page-item ${i === paginaActual ? 'active' : ''}"><a class="page-link" href="#" data-pagina="${i}">${i}</a></li>`;
+            }
+
+            if (paginaActual < totalPaginas) {
+                html += `<li class="page-item"><a class="page-link" href="#" data-pagina="${paginaActual + 1}">Siguiente</a></li>`;
+            }
+
+            ul.innerHTML = html;
+
+            ul.querySelectorAll('a[data-pagina]').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const pagina = parseInt(this.dataset.pagina);
+
+                    if (filtroSelect.value === 'vigentes') {
+                        cargarVigentes(pagina);
+                    } else if (filtroSelect.value === 'terminanEn') {
+                        cargarTerminanEn(inputDias.value, pagina);
+                    }
+                });
+            });
+        }
+
+        const inputDias = document.getElementById('inputDias');
+        const labelDias = document.getElementById('labelDias');
+
+        function cargarTerminanEn(dias, pagina = 1) {
+            fetch(`/Reserva/TerminanEn?dias=${dias}&pagina=${pagina}`)
+                .then(response => response.json())
+                .then(data => {
+                    cuerpoTabla.innerHTML = '';
+
+                    if (data.reservas.length === 0) {
+                        cuerpoTabla.innerHTML = '<tr><td colspan="7" class="text-muted text-center">No hay reservas que terminen en ese plazo.</td></tr>';
+                    } else {
+                        data.reservas.forEach(r => {
+                            cuerpoTabla.innerHTML += `
+                                <tr>
+                                    <td>${r.inquilino}</td>
+                                    <td>${r.inmueble}</td>
+                                    <td>${r.fechaInicio}</td>
+                                    <td>${r.fechaFin}</td>
+                                    <td>${r.montoDiario}</td>
+                                    <td><span class="text-muted">---</span></td>
+                                    <td class="text-end">
+                                        <a href="/Reserva/Details/${r.id}" class="btn btn-sm btn-info">Ver</a>
+                                        <a href="/Reserva/Edit/${r.id}" class="btn btn-sm btn-warning">Editar</a>
+                                        <a href="/Reserva/Delete/${r.id}" class="btn btn-sm btn-danger">Eliminar</a>
+                                    </td>
+                                </tr>`;
+                        });
+                    }
+
+                    renderizarPaginacionVigentes(data.paginaActual, data.totalPaginas); // reutilizamos la misma función
+                });
+        }
+
+        filtroSelect.addEventListener('change', function () {
+            paginacionNormal.style.display = 'none';
+            paginacionVigentes.style.display = 'none';
+            inputDias.style.display = 'none';
+            labelDias.style.display = 'none';
+
+            if (this.value === 'vigentes') {
+                paginacionVigentes.style.display = 'block';
+                cargarVigentes(1);
+            } else if (this.value === 'terminanEn') {
+                inputDias.style.display = 'inline-block';
+                labelDias.style.display = 'inline';
+                paginacionVigentes.style.display = 'block';
+                cargarTerminanEn(inputDias.value, 1);
+            } else {
+                location.reload();
+            }
+        });
+
+        inputDias.addEventListener('change', function () {
+            cargarTerminanEn(this.value, 1);
+        });
+    </script>
+}
