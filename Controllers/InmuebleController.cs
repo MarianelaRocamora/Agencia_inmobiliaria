@@ -286,5 +286,45 @@ namespace Agencia_inmobiliaria.Controllers
         
             return Path.Combine("/Uploads/Inmuebles", fileName).Replace("\\", "/");
         }
+
+        [HttpGet]
+        public IActionResult FiltrarPorDisponibilidad(string disponible = "todos", int pagina = 1)
+        {
+            try
+            {
+                int tamPagina = 10;
+                pagina = Math.Max(pagina, 1);
+
+                bool? filtro = disponible switch
+                {
+                    "si" => true,
+                    "no" => false,
+                    _ => null
+                };
+
+                var lista = repositorio.ObtenerPorDisponibilidad(filtro, pagina, tamPagina);
+                int totalRegistros = repositorio.ObtenerCantidadPorDisponibilidad(filtro);
+                int totalPaginas = totalRegistros == 0
+                    ? 1
+                    : (totalRegistros % tamPagina == 0 ? totalRegistros / tamPagina : totalRegistros / tamPagina + 1);
+
+                var datos = lista.Select(i => new
+                {
+                    id = i.IdInmueble,
+                    direccion = i.Direccion,
+                    propietario = $"{i.Propietario?.Nombre} {i.Propietario?.Apellido}",
+                    cupo = i.Cupo,
+                    precioDia = i.PrecioDia.ToString("C"),
+                    porcentajeReserva = i.PorcentajeReserva,
+                    disponible = i.Disponible
+                });
+
+                return Json(new { inmuebles = datos, paginaActual = pagina, totalPaginas });
+            }
+            catch (Exception)
+            {
+              return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
+            }
+        }
     }
 }

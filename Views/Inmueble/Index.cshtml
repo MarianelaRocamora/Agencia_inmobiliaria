@@ -11,9 +11,18 @@
 
 <h1>Inmuebles</h1>
 
-<p>
+<div class="d-flex justify-content-between align-items-center mb-3">
     <a asp-action="Create" class="btn btn-primary">Nuevo Inmueble</a>
-</p>
+
+    <div class="d-flex align-items-center gap-2">
+        <label for="filtroDisponible" class="mb-0">Disponibilidad:</label>
+        <select id="filtroDisponible" class="form-select" style="width: auto;">
+            <option value="todos" selected>Todos</option>
+            <option value="si">Disponibles</option>
+            <option value="no">Suspendidos</option>
+        </select>
+    </div>
+</div>
 
 @if (TempData["error"] != null)
 {
@@ -28,6 +37,7 @@
     <thead>
         <tr>
             <th>Dirección</th>
+            <th>Propietario</th>
             <th>Cupo</th>
             <th>Precio/día</th>
             <th>% Reserva</th>
@@ -35,11 +45,12 @@
             <th></th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="cuerpoTablaInmuebles">
         @foreach (var item in Model)
         {
             <tr>
                 <td>@item.Direccion</td>
+                <td>@item.Propietario?.Nombre @item.Propietario?.Apellido</td>
                 <td>@item.Cupo</td>
                 <td>@item.PrecioDia.ToString("C")</td>
                 <td>@item.PorcentajeReserva %</td>
@@ -65,7 +76,7 @@
 
 @if (totalPaginas > 1)
 {
-    <nav aria-label="Paginación de inmuebles">
+    <nav id="paginacionNormal" aria-label="Paginación de inmuebles">
         <ul class="pagination justify-content-center">
             @if (paginaActual > 1)
             {
@@ -110,5 +121,108 @@
             }
         </ul>
     </nav>
-    <p class="text-center text-muted">Página @paginaActual de @totalPaginas</p>
+    <p class="text-center text-muted" id="textoPaginaNormal">Página @paginaActual de @totalPaginas</p>
+}
+<nav id="paginacionFiltro" aria-label="Paginación filtrada" style="display: none;">
+    <ul class="pagination justify-content-center"></ul>
+</nav>
+<p class="text-center text-muted" id="textoPaginaFiltro" style="display: none;"></p>
+
+@section Scripts {
+    <script>
+        const filtroDisponible = document.getElementById('filtroDisponible');
+        const cuerpoTablaInmuebles = document.getElementById('cuerpoTablaInmuebles');
+        const paginacionNormalInm = document.getElementById('paginacionNormal');
+        const textoPaginaNormal = document.getElementById('textoPaginaNormal');
+        const paginacionFiltroInm = document.getElementById('paginacionFiltro');
+        const textoPaginaFiltro = document.getElementById('textoPaginaFiltro');
+
+        function cargarInmueblesFiltrados(disponible, pagina = 1) {
+            fetch(`/Inmueble/FiltrarPorDisponibilidad?disponible=${disponible}&pagina=${pagina}`)
+                .then(response => response.json())
+                .then(data => {
+                    cuerpoTablaInmuebles.innerHTML = '';
+
+                    if (data.inmuebles.length === 0) {
+                        cuerpoTablaInmuebles.innerHTML = '<tr><td colspan="7" class="text-muted text-center">No hay inmuebles para este filtro.</td></tr>';
+                    } else {
+                        data.inmuebles.forEach(i => {
+                            const badge = i.disponible
+                                ? '<span class="badge bg-success">Sí</span>'
+                                : '<span class="badge bg-secondary">No</span>';
+
+                            cuerpoTablaInmuebles.innerHTML += `
+                                <tr>
+                                    <td>${i.direccion}</td>
+                                    <td>${i.propietario}</td>
+                                    <td>${i.cupo}</td>
+                                    <td>${i.precioDia}</td>
+                                    <td>${i.porcentajeReserva} %</td>
+                                    <td>${badge}</td>
+                                    <td>
+                                        <a href="/Inmueble/Details/${i.id}" class="btn btn-sm btn-info">Detalles</a>
+                                        <a href="/Inmueble/Edit/${i.id}" class="btn btn-sm btn-secondary">Editar</a>
+                                        <a href="/Inmueble/Delete/${i.id}" class="btn btn-sm btn-danger">Eliminar</a>
+                                    </td>
+                                </tr>`;
+                        });
+                    }
+
+                    renderizarPaginacionFiltroInm(data.paginaActual, data.totalPaginas);
+                })
+                .catch(() => {
+                    cuerpoTablaInmuebles.innerHTML = '<tr><td colspan="7" class="text-danger text-center">Error al cargar los inmuebles.</td></tr>';
+                });
+        }
+
+        function renderizarPaginacionFiltroInm(paginaActual, totalPaginas) {
+            const ul = paginacionFiltroInm.querySelector('ul');
+            let html = '';
+
+            if (totalPaginas > 1) {
+                html += paginaActual > 1
+                    ? `<li class="page-item"><a class="page-link" href="#" data-pagina="1">&laquo;</a></li>
+                       <li class="page-item"><a class="page-link" href="#" data-pagina="${paginaActual - 1}">&lsaquo;</a></li>`
+                    : `<li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                       <li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>`;
+
+                const desde = Math.max(1, Math.min(paginaActual - 2, totalPaginas - 4));
+                const hasta = Math.min(totalPaginas, desde + 4);
+
+                for (let p = desde; p <= hasta; p++) {
+                    html += p === paginaActual
+                        ? `<li class="page-item active"><span class="page-link">${p}</span></li>`
+                        : `<li class="page-item"><a class="page-link" href="#" data-pagina="${p}">${p}</a></li>`;
+                }
+
+                html += paginaActual < totalPaginas
+                    ? `<li class="page-item"><a class="page-link" href="#" data-pagina="${paginaActual + 1}">&rsaquo;</a></li>
+                       <li class="page-item"><a class="page-link" href="#" data-pagina="${totalPaginas}">&raquo;</a></li>`
+                    : `<li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
+                       <li class="page-item disabled"><span class="page-link">&raquo;</span></li>`;
+            }
+
+            ul.innerHTML = html;
+            textoPaginaFiltro.textContent = totalPaginas > 1 ? `Página ${paginaActual} de ${totalPaginas}` : '';
+
+            ul.querySelectorAll('a[data-pagina]').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    cargarInmueblesFiltrados(filtroDisponible.value, parseInt(this.dataset.pagina));
+                });
+            });
+        }
+
+        filtroDisponible.addEventListener('change', function () {
+            if (this.value === 'todos') {
+                location.reload();
+            } else {
+                if (paginacionNormalInm) paginacionNormalInm.style.display = 'none';
+                if (textoPaginaNormal) textoPaginaNormal.style.display = 'none';
+                paginacionFiltroInm.style.display = 'block';
+                textoPaginaFiltro.style.display = 'block';
+                cargarInmueblesFiltrados(this.value, 1);
+            }
+        });
+    </script>
 }

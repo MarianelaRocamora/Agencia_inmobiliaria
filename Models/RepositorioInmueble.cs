@@ -99,10 +99,15 @@ namespace Agencia_inmobiliaria.Models
         public IList<Inmueble> ObtenerLista(int paginaNro = 1, int tamPagina = 10)
         {
             var lista = new List<Inmueble>();
-            string sql = @"SELECT ID_inmueble, direccion, cupo, precio_dia, porcentaje_reserva, latitud, longitud, portada, disponible, ID_tipo_inmueble, ID_propietario, estado
-                            FROM inmueble
-                            WHERE estado = 1
-                            ORDER BY ID_inmueble
+            string sql = @"SELECT ID_inmueble, inm.direccion, cupo, precio_dia, porcentaje_reserva, latitud, 
+                                  longitud, portada, disponible, ID_tipo_inmueble, inm.ID_propietario, inm.estado, 
+			                      p.nombre, p.apellido, p.dni, p.telefono, p.email, p.direccion AS direccionPropetario
+	                        FROM inmueble inm
+	                        JOIN propietario p
+	                        ON inm.ID_propietario = p.ID_propietario
+	                        WHERE inm.estado = 1
+	                        AND p.estado = 1
+	                        ORDER BY ID_inmueble
                             LIMIT @tamPagina OFFSET @offset";
 
             using (var connection = new MySqlConnection(connectionString))
@@ -129,7 +134,17 @@ namespace Agencia_inmobiliaria.Models
                             Disponible = reader.GetBoolean("disponible"),
                             IdTipoInmueble = reader.GetInt32("ID_tipo_inmueble"),
                             IdPropietario = reader.GetInt32("ID_propietario"),
-                            Estado = reader.GetBoolean("estado")
+                            Estado = reader.GetBoolean("estado"),
+                            Propietario = new Propietario
+                            {
+                                IdPropietario = reader.GetInt32("ID_propietario"),
+                                Nombre = reader.GetString("nombre"),
+                                Apellido = reader.GetString("apellido"),
+                                Dni = reader.GetString("dni"),
+                                Direccion = reader.GetString("direccionPropetario"),
+                                Telefono = reader.GetString("telefono"),
+                                Email = reader.GetString("email")
+                            }
                         });
                     }
                 }
@@ -141,7 +156,7 @@ namespace Agencia_inmobiliaria.Models
         public int ObtenerCantidad()
         {
             int cantidad = 0;
-            string sql = "SELECT COUNT(*) FROM inmueble WHERE estado = 1";
+            string sql = @"SELECT COUNT(*) FROM inmueble inm JOIN propietario p ON inm.ID_propietario = p.ID_propietario WHERE inm.estado = 1 AND p.estado = 1";
 
             using (var connection = new MySqlConnection(connectionString))
             {
@@ -276,6 +291,89 @@ namespace Agencia_inmobiliaria.Models
 
                 return cantidadSolapadas == 0;
             }
+        }
+        public IList<Inmueble> ObtenerPorDisponibilidad(bool? disponible, int paginaNro = 1, int tamPagina = 10)
+        {
+            var lista = new List<Inmueble>();
+            string condicionFiltro = disponible.HasValue ? "AND inm.disponible = @disponible" : "";
+            string sql = $@"SELECT ID_inmueble, inm.direccion, cupo, precio_dia, porcentaje_reserva, latitud, 
+                                  longitud, portada, disponible, ID_tipo_inmueble, inm.ID_propietario, inm.estado, 
+			                      p.nombre, p.apellido, p.dni, p.telefono, p.email, p.direccion AS direccionPropetario
+	                        FROM inmueble inm
+	                        JOIN propietario p
+	                        ON inm.ID_propietario = p.ID_propietario
+	                        WHERE inm.estado = 1
+	                        AND p.estado = 1
+                            {condicionFiltro}
+	                        ORDER BY ID_inmueble
+                            LIMIT @tamPagina OFFSET @offset";
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                var command = new MySqlCommand(sql, connection);
+                if (disponible.HasValue)
+                {
+                    command.Parameters.AddWithValue("@disponible", disponible.Value);
+                }
+                command.Parameters.AddWithValue("@tamPagina", tamPagina);
+                command.Parameters.AddWithValue("@offset", (paginaNro - 1) * tamPagina);
+
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new Inmueble
+                        {
+                            IdInmueble = reader.GetInt32("ID_inmueble"),
+                            Direccion = reader.GetString("direccion"),
+                            Cupo = reader.GetInt32("cupo"),
+                            PrecioDia = reader.GetDecimal("precio_dia"),
+                            PorcentajeReserva = reader.GetDecimal("porcentaje_reserva"),
+                            Latitud = reader.GetDecimal("latitud"),
+                            Longitud = reader.GetDecimal("longitud"),
+                            Portada = reader.IsDBNull(reader.GetOrdinal("portada")) ? null : reader.GetString("portada"),
+                            Disponible = reader.GetBoolean("disponible"),
+                            IdTipoInmueble = reader.GetInt32("ID_tipo_inmueble"),
+                            IdPropietario = reader.GetInt32("ID_propietario"),
+                            Estado = reader.GetBoolean("estado"),
+                            Propietario = new Propietario
+                            {
+                                IdPropietario = reader.GetInt32("ID_propietario"),
+                                Nombre = reader.GetString("nombre"),
+                                Apellido = reader.GetString("apellido"),
+                                Dni = reader.GetString("dni"),
+                                Direccion = reader.GetString("direccionPropetario"),
+                                Telefono = reader.GetString("telefono"),
+                                Email = reader.GetString("email")
+                            }
+                        });
+                    }
+                }
+            }
+
+            return lista;
+        }
+
+        public int ObtenerCantidadPorDisponibilidad(bool? disponible)
+        {
+            int cantidad = 0;
+            string condicionFiltro = disponible.HasValue ? "AND disponible = @disponible" : "";
+            string sql = $@"SELECT COUNT(*) FROM inmueble inm JOIN propietario p ON inm.ID_propietario = p.ID_propietario WHERE inm.estado = 1 AND p.estado = 1 {condicionFiltro}";
+        
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                var command = new MySqlCommand(sql, connection);
+                if (disponible.HasValue)
+                {
+                    command.Parameters.AddWithValue("@disponible", disponible.Value);
+                }
+        
+                connection.Open();
+                cantidad = Convert.ToInt32(command.ExecuteScalar());
+            }
+        
+            return cantidad;
         }
     }
 }
