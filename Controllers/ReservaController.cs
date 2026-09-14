@@ -72,6 +72,10 @@ namespace Agencia_inmobiliaria.Controllers
             {
                 ModelState.AddModelError("", "La fecha de fin debe ser posterior a la fecha de inicio.");
             }
+             if (reserva.FechaIngreso.Date < DateTime.Today)
+            {
+                ModelState.AddModelError("", "La fecha de ingreso no puede ser anterior a hoy.");
+            }
 
             if (!ModelState.IsValid)
             {
@@ -335,6 +339,10 @@ namespace Agencia_inmobiliaria.Controllers
             if (reserva.FechaEgreso <= reserva.FechaIngreso)
             {
                 ModelState.AddModelError("", "La fecha de fin debe ser posterior a la fecha de inicio.");
+            }
+            if (reserva.FechaIngreso.Date < DateTime.Today)
+            {
+                ModelState.AddModelError("", "La fecha de ingreso no puede ser anterior a hoy.");
             }
 
             if (!ModelState.IsValid)

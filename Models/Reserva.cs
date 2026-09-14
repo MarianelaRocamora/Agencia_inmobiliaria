@@ -15,7 +15,9 @@ namespace Agencia_inmobiliaria.Models
         public DateTime? FechaCancelacion {get; set;}
 
         [Required(ErrorMessage ="El monto por día es obligatorio")]
-        public double MontoDia {get; set;}
+        [Range(0.01, double.MaxValue, ErrorMessage = "El monto por día debe ser mayor a 0")]
+        public decimal MontoDia {get; set;}
+
         public bool Estado {get; set;} = true;
 
         public int IdInmueble {get; set;}
@@ -31,7 +33,20 @@ namespace Agencia_inmobiliaria.Models
                     "La fecha de egreso debe ser mayor a la fecha de ingreso",
                     [nameof(FechaEgreso)]);
             }
-    
+
+            if (FechaIngreso.Year < 2000 || FechaIngreso.Year > 2800)
+            {
+                yield return new ValidationResult(
+                    "La fecha de ingreso no es válida",
+                    [nameof(FechaIngreso)]);
+            }
+
+            if (FechaEgreso.Year < 2000 || FechaEgreso.Year > 2800)
+            {
+                yield return new ValidationResult(
+                    "La fecha de egreso no es válida",
+                    [nameof(FechaEgreso)]);
+            }
         }
     }
 }
