@@ -145,7 +145,7 @@ namespace Agencia_inmobiliaria.Models
                             IdReserva = reader.GetInt32("ID_reserva"),
                             FechaIngreso = reader.GetDateTime("fecha_ingreso"),
                             FechaEgreso = reader.GetDateTime("fecha_egreso"),
-                            MontoDia = reader.GetDouble("monto_dia"),
+                            MontoDia = reader.GetDecimal("monto_dia"),
                             IdInmueble = reader.GetInt32("ID_inmueble"),
                             IdInquilino = reader.GetInt32("ID_inquilino"),
                             FechaCancelacion = reader.IsDBNull(reader.GetOrdinal("fecha_cancelacion"))
@@ -204,7 +204,7 @@ namespace Agencia_inmobiliaria.Models
                             IdReserva = reader.GetInt32("ID_reserva"),
                             FechaIngreso = reader.GetDateTime("fecha_ingreso"),
                             FechaEgreso = reader.GetDateTime("fecha_egreso"),
-                            MontoDia = reader.GetDouble("monto_dia"),
+                            MontoDia = reader.GetDecimal("monto_dia"),
                             IdInmueble = reader.GetInt32("ID_inmueble"),
                             IdInquilino = reader.GetInt32("ID_inquilino"),
                             FechaCancelacion = reader.IsDBNull(reader.GetOrdinal("fecha_cancelacion"))
@@ -289,7 +289,7 @@ namespace Agencia_inmobiliaria.Models
                             IdReserva = reader.GetInt32("ID_reserva"),
                             FechaIngreso = reader.GetDateTime("fecha_ingreso"),
                             FechaEgreso = reader.GetDateTime("fecha_egreso"),
-                            MontoDia = reader.GetDouble("monto_dia"),
+                            MontoDia = reader.GetDecimal("monto_dia"),
                             IdInmueble = reader.GetInt32("ID_inmueble"),
                             IdInquilino = reader.GetInt32("ID_inquilino"),
                             FechaCancelacion = reader.IsDBNull(reader.GetOrdinal("fecha_cancelacion"))
@@ -379,7 +379,7 @@ namespace Agencia_inmobiliaria.Models
                             IdReserva = reader.GetInt32("ID_reserva"),
                             FechaIngreso = reader.GetDateTime("fecha_ingreso"),
                             FechaEgreso = reader.GetDateTime("fecha_egreso"),
-                            MontoDia = reader.GetDouble("monto_dia"),
+                            MontoDia = reader.GetDecimal("monto_dia"),
                             IdInmueble = reader.GetInt32("ID_inmueble"),
                             IdInquilino = reader.GetInt32("ID_inquilino"),
                             FechaCancelacion = reader.IsDBNull(reader.GetOrdinal("fecha_cancelacion"))
