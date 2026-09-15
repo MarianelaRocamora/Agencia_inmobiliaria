@@ -11,122 +11,175 @@
 
 <h1>Inmuebles</h1>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <a asp-action="Create" class="btn btn-primary">Nuevo Inmueble</a>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <button class="nav-link active" id="tab-todos" data-bs-toggle="tab" data-bs-target="#panel-todos" type="button">Todos</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="tab-buscar" data-bs-toggle="tab" data-bs-target="#panel-buscar" type="button">Buscar por fechas</button>
+    </li>
+</ul>
 
-    <div class="d-flex align-items-center gap-2">
-        <label for="filtroDisponible" class="mb-0">Disponibilidad:</label>
-        <select id="filtroDisponible" class="form-select" style="width: auto;">
-            <option value="todos" selected>Todos</option>
-            <option value="si">Disponibles</option>
-            <option value="no">Suspendidos</option>
-        </select>
-    </div>
-</div>
-
-@if (TempData["error"] != null)
-{
-    <div class="alert alert-danger">@TempData["error"]</div>
-}
-@if (TempData["success"] != null)
-{
-    <div class="alert alert-success">@TempData["success"]</div>
-}
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Dirección</th>
-            <th>Propietario</th>
-            <th>Cupo</th>
-            <th>Precio/día</th>
-            <th>% Reserva</th>
-            <th>Disponible</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody id="cuerpoTablaInmuebles">
-        @foreach (var item in Model)
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="panel-todos">
+        <p>
+            <a asp-action="Create" class="btn btn-primary">Nuevo Inmueble</a>
+        </p>
+        @if (TempData["error"] != null)
         {
-            <tr>
-                <td>@item.Direccion</td>
-                <td>@item.Propietario?.Nombre @item.Propietario?.Apellido</td>
-                <td>@item.Cupo</td>
-                <td>@item.PrecioDia.ToString("C")</td>
-                <td>@item.PorcentajeReserva %</td>
-                <td>
-                    @if (item.Disponible)
+            <div class="alert alert-danger">@TempData["error"]</div>
+        }
+        @if (TempData["success"] != null)
+        {
+            <div class="alert alert-success">@TempData["success"]</div>
+        }
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <label for="filtroDisponible" class="mb-0">Disponibilidad:</label>
+            <select id="filtroDisponible" class="form-select" style="width: auto;">
+                <option value="todos" selected>Todos</option>
+                <option value="si">Disponibles</option>
+                <option value="no">Suspendidos</option>
+            </select>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Dirección</th>
+                    <th>Propietario</th>
+                    <th>Cupo</th>
+                    <th>Precio/día</th>
+                    <th>% Reserva</th>
+                    <th>Disponible</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoTablaInmuebles">
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Direccion</td>
+                        <td>@item.Propietario?.Nombre @item.Propietario?.Apellido</td>
+                        <td>@item.Cupo</td>
+                        <td>@item.PrecioDia.ToString("C")</td>
+                        <td>@item.PorcentajeReserva %</td>
+                        <td>
+                            @if (item.Disponible)
+                            {
+                                <span class="badge bg-success">Sí</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">No</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-info">Detalles</a>
+                            <a asp-action="Edit" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-secondary">Editar</a>
+                            <a asp-action="Delete" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-danger">Eliminar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        @if (totalPaginas > 1)
+        {
+            <nav id="paginacionNormal" aria-label="Paginación de inmuebles">
+                <ul class="pagination justify-content-center">
+                    @if (paginaActual > 1)
                     {
-                        <span class="badge bg-success">Sí</span>
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-pagina="1" title="Primera">&laquo;</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual - 1)" title="Anterior">&lsaquo;</a>
+                        </li>
                     }
                     else
                     {
-                        <span class="badge bg-secondary">No</span>
+                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                        <li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>
                     }
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-info">Detalles</a>
-                    <a asp-action="Edit" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-secondary">Editar</a>
-                    <a asp-action="Delete" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-danger">Eliminar</a>
-                </td>
-            </tr>
+
+                    @for (int p = desde; p <= hasta; p++)
+                    {
+                        if (p == paginaActual)
+                        {
+                            <li class="page-item active" aria-current="page"><span class="page-link">@p</span></li>
+                        }
+                        else
+                        {
+                            <li class="page-item"><a class="page-link" asp-action="Index" asp-route-pagina="@p">@p</a></li>
+                        }
+                    }
+
+                    @if (paginaActual < totalPaginas)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual + 1)" title="Siguiente">&rsaquo;</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-pagina="@totalPaginas" title="Última">&raquo;</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
+                        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                    }
+                </ul>
+            </nav>
+            <p class="text-center text-muted" id="textoPaginaNormal">Página @paginaActual de @totalPaginas</p>
         }
-    </tbody>
-</table>
+        <nav id="paginacionFiltro" aria-label="Paginación filtrada" style="display: none;">
+            <ul class="pagination justify-content-center"></ul>
+        </nav>
+            <p class="text-center text-muted" id="textoPaginaFiltro" style="display: none;"></p>
+    </div>
 
-@if (totalPaginas > 1)
-{
-    <nav id="paginacionNormal" aria-label="Paginación de inmuebles">
-        <ul class="pagination justify-content-center">
-            @if (paginaActual > 1)
-            {
-                <li class="page-item">
-                    <a class="page-link" asp-action="Index" asp-route-pagina="1" title="Primera">&laquo;</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual - 1)" title="Anterior">&lsaquo;</a>
-                </li>
-            }
-            else
-            {
-                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-                <li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>
-            }
+    <div class="tab-pane fade" id="panel-buscar">
+        <form id="formBuscarFechas" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label class="form-label">Fecha de inicio</label>
+                <input type="date" id="fechaInicioBusqueda" class="form-control" required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Fecha de fin</label>
+                <input type="date" id="fechaFinBusqueda" class="form-control" required />
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-nuevo w-100">Buscar</button>
+            </div>
+        </form>
 
-            @for (int p = desde; p <= hasta; p++)
-            {
-                if (p == paginaActual)
-                {
-                    <li class="page-item active" aria-current="page"><span class="page-link">@p</span></li>
-                }
-                else
-                {
-                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-pagina="@p">@p</a></li>
-                }
-            }
+        <p id="mensajeBusqueda" class="text-muted"></p>
 
-            @if (paginaActual < totalPaginas)
-            {
-                <li class="page-item">
-                    <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual + 1)" title="Siguiente">&rsaquo;</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" asp-action="Index" asp-route-pagina="@totalPaginas" title="Última">&raquo;</a>
-                </li>
-            }
-            else
-            {
-                <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
-                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-            }
-        </ul>
-    </nav>
-    <p class="text-center text-muted" id="textoPaginaNormal">Página @paginaActual de @totalPaginas</p>
-}
-<nav id="paginacionFiltro" aria-label="Paginación filtrada" style="display: none;">
-    <ul class="pagination justify-content-center"></ul>
-</nav>
-<p class="text-center text-muted" id="textoPaginaFiltro" style="display: none;"></p>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Dirección</th>
+                    <th>Propietario</th>
+                    <th>Cupo</th>
+                    <th>Precio/día</th>
+                    <th>% Reserva</th>
+                    <th>Disponible</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoTablaBusqueda"></tbody>
+        </table>
+
+        <nav id="paginacionBusqueda" aria-label="Paginación de búsqueda">
+            <ul class="pagination justify-content-center"></ul>
+        </nav>
+    </div>
+</div>
+
+
+
+
+
+
 
 @section Scripts {
     <script>
@@ -223,6 +276,89 @@
                 textoPaginaFiltro.style.display = 'block';
                 cargarInmueblesFiltrados(this.value, 1);
             }
+        });
+
+        const formBuscarFechas = document.getElementById('formBuscarFechas');
+        const cuerpoTablaBusqueda = document.getElementById('cuerpoTablaBusqueda');
+        const paginacionBusqueda = document.getElementById('paginacionBusqueda');
+        const mensajeBusqueda = document.getElementById('mensajeBusqueda');
+        let ultimaBusqueda = { inicio: null, fin: null };
+
+        function buscarPorFechas(inicio, fin, pagina = 1) {
+            mensajeBusqueda.textContent = 'Buscando...';
+
+            fetch(`/Inmueble/BuscarPorFechasAjax?fechaInicio=${inicio}&fechaFin=${fin}&pagina=${pagina}`)
+                .then(response => response.json())
+                .then(data => {
+                    cuerpoTablaBusqueda.innerHTML = '';
+
+                    if (data.inmuebles.length === 0) {
+                        mensajeBusqueda.textContent = 'No hay inmuebles disponibles para ese rango de fechas.';
+                    } else {
+                        mensajeBusqueda.textContent = '';
+                        data.inmuebles.forEach(i => {
+                            const badge = i.disponible
+                                ? '<span class="badge bg-success">Sí</span>'
+                                : '<span class="badge bg-secondary">No</span>';
+                            cuerpoTablaBusqueda.innerHTML += `
+                                <tr>
+                                    <td>${i.direccion}</td>
+                                    <td>${i.propietario}</td>
+                                    <td>${i.cupo}</td>
+                                    <td>${i.precioDia}</td>
+                                    <td>${i.porcentajeReserva}</td>
+                                    <td>${badge}</td>
+                                    <td><a href="/Inmueble/Details/${i.id}" class="btn btn-sm btn-info">Ver</a></td>
+                                </tr>`;
+                        });
+                    }
+
+                    renderizarPaginacionBusqueda(data.paginaActual, data.totalPaginas);
+                })
+                .catch(() => {
+                    mensajeBusqueda.textContent = 'Error al buscar. Intente nuevamente.';
+                });
+        }
+
+        function renderizarPaginacionBusqueda(paginaActual, totalPaginas) {
+            const ul = paginacionBusqueda.querySelector('ul');
+            let html = '';
+
+            if (totalPaginas > 1) {
+                if (paginaActual > 1) {
+                    html += `<li class="page-item"><a class="page-link" href="#" data-pagina="${paginaActual - 1}">&lsaquo;</a></li>`;
+                }
+                for (let p = 1; p <= totalPaginas; p++) {
+                    html += p === paginaActual
+                        ? `<li class="page-item active"><span class="page-link">${p}</span></li>`
+                        : `<li class="page-item"><a class="page-link" href="#" data-pagina="${p}">${p}</a></li>`;
+                }
+                if (paginaActual < totalPaginas) {
+                    html += `<li class="page-item"><a class="page-link" href="#" data-pagina="${paginaActual + 1}">&rsaquo;</a></li>`;
+                }
+            }
+
+            ul.innerHTML = html;
+            ul.querySelectorAll('a[data-pagina]').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    buscarPorFechas(ultimaBusqueda.inicio, ultimaBusqueda.fin, parseInt(this.dataset.pagina));
+                });
+            });
+        }
+
+        formBuscarFechas.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const inicio = document.getElementById('fechaInicioBusqueda').value;
+            const fin = document.getElementById('fechaFinBusqueda').value;
+
+            if (fin <= inicio) {
+                mensajeBusqueda.textContent = 'La fecha de fin debe ser posterior a la de inicio.';
+                return;
+            }
+
+            ultimaBusqueda = { inicio, fin };
+            buscarPorFechas(inicio, fin, 1);
         });
     </script>
 }

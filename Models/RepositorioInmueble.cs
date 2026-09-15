@@ -213,10 +213,9 @@ namespace Agencia_inmobiliaria.Models
             string sql = @"SELECT inm.ID_inmueble, inm.direccion, inm.cupo, inm.ID_tipo_inmueble, 
                             inm.latitud, inm.longitud, inm.precio_dia, inm.porcentaje_reserva, 
                             inm.ID_propietario, inm.estado, inm.disponible, inm.portada,
-                            ti.nombre AS tipoNombre
+                            ti.nombre AS tipoNombre,
                            FROM inmueble inm
                            JOIN tipo_inmueble ti ON inm.ID_tipo_inmueble = ti.ID_tipo_inmueble
-                           WHERE inm.estado = 1
                              AND inm.disponible = 1
                              AND NOT EXISTS (
                                  SELECT 1 FROM reserva r
@@ -291,6 +290,107 @@ namespace Agencia_inmobiliaria.Models
 
                 return cantidadSolapadas == 0;
             }
+        }
+
+        public IList<Inmueble> ObtenerDisponiblesEntreFechasPaginado(DateTime fechaInicio, DateTime fechaFin, int paginaNro = 1, int tamPagina = 10)
+        {
+            var lista = new List<Inmueble>();
+            string sql = @"SELECT inm.ID_inmueble, inm.direccion, inm.cupo, inm.ID_tipo_inmueble, 
+                            inm.latitud, inm.longitud, inm.precio_dia, inm.porcentaje_reserva, 
+                            inm.ID_propietario, inm.estado, inm.disponible, inm.portada,
+                            ti.nombre AS tipoNombre,
+                            p.nombre, p.apellido, p.dni, p.telefono, p.email, p.direccion AS direccionPropetario
+                           FROM inmueble inm
+                           JOIN tipo_inmueble ti ON inm.ID_tipo_inmueble = ti.ID_tipo_inmueble
+                           JOIN propietario p ON inm.ID_propietario = p.ID_propietario
+                           WHERE inm.estado = 1
+                             AND inm.disponible = 1
+                             AND NOT EXISTS (
+                                 SELECT 1 FROM reserva r
+                                 WHERE r.ID_inmueble = inm.ID_inmueble
+                                   AND r.estado = 1
+                                   AND r.fecha_cancelacion IS NULL
+                                   AND r.fecha_ingreso < @fechaEgreso
+                                   AND r.fecha_egreso > @fechaIngreso
+                             )
+                           ORDER BY inm.direccion
+                           LIMIT @tamPagina OFFSET @offset";
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                var command = new MySqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@fechaIngreso", fechaInicio);
+                command.Parameters.AddWithValue("@fechaEgreso", fechaFin);
+                command.Parameters.AddWithValue("@tamPagina", tamPagina);
+                command.Parameters.AddWithValue("@offset", (paginaNro - 1) * tamPagina);
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new Inmueble
+                        {
+                            IdInmueble = reader.GetInt32("ID_inmueble"),
+                            Direccion = reader.GetString("direccion"),
+                            Cupo = reader.GetInt32("cupo"),
+                            IdTipoInmueble = reader.GetInt32("ID_tipo_inmueble"),
+                            Latitud = reader.GetDecimal("latitud"),
+                            Longitud = reader.GetDecimal("longitud"),
+                            PrecioDia = reader.GetDecimal("precio_dia"),
+                            PorcentajeReserva = reader.GetDecimal("porcentaje_reserva"),
+                            IdPropietario = reader.GetInt32("ID_propietario"),
+                            Estado = reader.GetBoolean("estado"),
+                            Disponible = reader.GetBoolean("disponible"),
+                            Portada = reader.IsDBNull(reader.GetOrdinal("portada")) ? null : reader.GetString("portada"),
+                            TipoInmueble = new TipoInmueble
+                            {
+                                IdTipoInmueble = reader.GetInt32("ID_tipo_inmueble"),
+                                Nombre = reader.GetString("tipoNombre")
+                            },
+                            Propietario = new Propietario
+                            {
+                                IdPropietario = reader.GetInt32("ID_propietario"),
+                                Nombre = reader.GetString("nombre"),
+                                Apellido = reader.GetString("apellido"),
+                                Dni = reader.GetString("dni"),
+                                Direccion = reader.GetString("direccionPropetario"),
+                                Telefono = reader.GetString("telefono"),
+                                Email = reader.GetString("email")
+                            }
+                        });
+                    }
+                }
+            }
+
+            return lista;
+        }
+
+        public int ObtenerCantidadDisponiblesEntreFechas(DateTime fechaInicio, DateTime fechaFin)
+        {
+            int cantidad = 0;
+            string sql = @"SELECT COUNT(*) FROM inmueble inm
+                           WHERE inm.estado = 1
+                             AND inm.disponible = 1
+                             AND NOT EXISTS (
+                                 SELECT 1 FROM reserva r
+                                 WHERE r.ID_inmueble = inm.ID_inmueble
+                                   AND r.estado = 1
+                                   AND r.fecha_cancelacion IS NULL
+                                   AND r.fecha_ingreso < @fechaFin
+                                   AND r.fecha_egreso > @fechaInicio
+                             )";
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                var command = new MySqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@fechaInicio", fechaInicio);
+                command.Parameters.AddWithValue("@fechaFin", fechaFin);
+
+                connection.Open();
+                cantidad = Convert.ToInt32(command.ExecuteScalar());
+            }
+
+            return cantidad;
         }
         public IList<Inmueble> ObtenerPorDisponibilidad(bool? disponible, int paginaNro = 1, int tamPagina = 10)
         {

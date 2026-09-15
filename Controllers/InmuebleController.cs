@@ -9,17 +9,20 @@ namespace Agencia_inmobiliaria.Controllers
         private readonly IRepositorioTipoInmueble repositorioTipoInmueble;
         private readonly IRepositorioPropietario repositorioPropietario;
         private readonly IRepositorioImagen repositorioImagen;
+        private readonly ILogger<ReservaController> logger;
 
         public InmuebleController(
             IRepositorioInmueble repositorio,
             IRepositorioTipoInmueble repositorioTipoInmueble,
             IRepositorioPropietario repositorioPropietario,
-            IRepositorioImagen repositorioImagen)
+            IRepositorioImagen repositorioImagen,
+            ILogger<ReservaController> logger)
         {
             this.repositorio = repositorio;
             this.repositorioTipoInmueble = repositorioTipoInmueble;
             this.repositorioPropietario = repositorioPropietario;
             this.repositorioImagen = repositorioImagen;
+            this.logger = logger;
         }
 
         private void CargarCombos(Inmueble? inmueble = null)
@@ -324,6 +327,45 @@ namespace Agencia_inmobiliaria.Controllers
             catch (Exception)
             {
               return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult BuscarPorFechasAjax(DateTime fechaInicio, DateTime fechaFin, int pagina = 1)
+        {
+            try
+            {
+                int tamPagina = 10;
+                pagina = Math.Max(pagina, 1);
+
+                if (fechaFin <= fechaInicio)
+                {
+                    return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
+                }
+
+                var lista = repositorio.ObtenerDisponiblesEntreFechasPaginado(fechaInicio, fechaFin, pagina, tamPagina);
+                int totalRegistros = repositorio.ObtenerCantidadDisponiblesEntreFechas(fechaInicio, fechaFin);
+                int totalPaginas = totalRegistros == 0
+                    ? 1
+                    : (totalRegistros % tamPagina == 0 ? totalRegistros / tamPagina : totalRegistros / tamPagina + 1);
+
+                var datos = lista.Select(i => new
+                {
+                    id = i.IdInmueble,
+                    direccion = i.Direccion,
+                    propietario = $"{i.Propietario?.Nombre} {i.Propietario?.Apellido}",
+                    cupo = i.Cupo,
+                    precioDia = i.PrecioDia.ToString("C"),
+                    porcentajeReserva = i.PorcentajeReserva,
+                    disponible = i.Disponible
+                });
+
+                return Json(new { inmuebles = datos, paginaActual = pagina, totalPaginas });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al buscar inmuebles disponibles entre fechas");
+                return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
             }
         }
     }
