@@ -79,9 +79,9 @@ namespace Agencia_inmobiliaria.Controllers
 
                 return View(inmueble);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData["error"] = "No se pudo cargar el inmueble. Intente nuevamente.";
+                TempData["error"] = "No se pudo cargar el inmueble. Intente nuevamente." + ex.Message;
                 return RedirectToAction(nameof(Index));
             }
         }

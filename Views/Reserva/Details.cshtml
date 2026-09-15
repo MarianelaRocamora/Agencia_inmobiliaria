@@ -37,7 +37,7 @@
             <dd class="col-sm-8">@Model.Inmueble?.Cupo personas</dd>
 
             <dt class="col-sm-4">Precio por día</dt>
-            <dd class="col-sm-8">@Model.Inmueble?.PrecioDia.ToString("C")</dd>
+            <dd class="col-sm-8">@Model.Inmueble?.PrecioDia.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</dd>
         </dl>
     </div>
 </div>

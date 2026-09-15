@@ -23,7 +23,7 @@
         <dd class="col-sm-9">@Model.FechaEgreso.ToString("dd/MM/yyyy")</dd>
 
         <dt class="col-sm-3">Monto Diario</dt>
-        <dd class="col-sm-9">@Model.MontoDia.ToString("C")</dd>
+        <dd class="col-sm-9">@Model.MontoDia.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</dd>
 
         <dt class="col-sm-3">Fecha Cancelación</dt>
         <dd class="col-sm-9">

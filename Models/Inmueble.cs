@@ -26,10 +26,12 @@ namespace Agencia_inmobiliaria.Models
 
 
         [Required(ErrorMessage = "Las coordenadas son obligatorias")]
+        [Range(-90, 90, ErrorMessage = "La latitud debe estar entre -90 y 90")]
         [Display(Name = "Latitud")]
         public decimal Latitud { get; set; }
         
         [Required(ErrorMessage = "Las coordenadas son obligatorias")]
+        [Range(-180, 180, ErrorMessage = "La longitud debe estar entre -180 y 180")]
         [Display(Name = "Longitud")]
 		public decimal Longitud { get; set; }
 

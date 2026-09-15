@@ -60,7 +60,7 @@
                         <td>@item.Direccion</td>
                         <td>@item.Propietario?.Nombre @item.Propietario?.Apellido</td>
                         <td>@item.Cupo</td>
-                        <td>@item.PrecioDia.ToString("C")</td>
+                        <td>@item.PrecioDia.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</td>
                         <td>@item.PorcentajeReserva %</td>
                         <td>
                             @if (item.Disponible)
@@ -193,6 +193,10 @@
         const textoPaginaNormal = document.getElementById('textoPaginaNormal');
         const paginacionFiltroInm = document.getElementById('paginacionFiltro');
         const textoPaginaFiltro = document.getElementById('textoPaginaFiltro');
+        const formatoMoneda = new Intl.NumberFormat(undefined, {
+            style: 'currency',
+            currency: 'ARS'
+        });
 
         function cargarInmueblesFiltrados(disponible, pagina = 1) {
             fetch(`/Inmueble/FiltrarPorDisponibilidad?disponible=${disponible}&pagina=${pagina}`)
@@ -213,7 +217,7 @@
                                     <td>${i.direccion}</td>
                                     <td>${i.propietario}</td>
                                     <td>${i.cupo}</td>
-                                    <td>${i.precioDia}</td>
+                                    <td>${formatoMoneda.format(i.precioDia)}</td>
                                     <td>${i.porcentajeReserva} %</td>
                                     <td>${badge}</td>
                                     <td>
@@ -309,7 +313,7 @@
                                     <td>${i.direccion}</td>
                                     <td>${i.propietario}</td>
                                     <td>${i.cupo}</td>
-                                    <td>${i.precioDia}</td>
+                                    <td>${formatoMoneda.format(i.precioDia)}</td>
                                     <td>${i.porcentajeReserva}</td>
                                     <td>${badge}</td>
                                     <td><a href="/Inmueble/Details/${i.id}" class="btn btn-sm btn-info">Ver</a></td>

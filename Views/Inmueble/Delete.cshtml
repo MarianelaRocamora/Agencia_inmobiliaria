@@ -18,7 +18,7 @@
     <dd class="col-sm-10">@Model.Cupo</dd>
 
     <dt class="col-sm-2">Precio/día</dt>
-    <dd class="col-sm-10">@Model.PrecioDia.ToString("C")</dd>
+    <dd class="col-sm-10">@Model.PrecioDia.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</dd>
 
     <dt class="col-sm-2">% Reserva</dt>
     <dd class="col-sm-10">@Model.PorcentajeReserva %</dd>

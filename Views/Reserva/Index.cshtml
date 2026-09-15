@@ -41,7 +41,7 @@
                 <td>@item.Inmueble?.Direccion</td>
                 <td>@item.FechaIngreso.ToString("dd/MM/yyyy")</td>
                 <td>@item.FechaEgreso.ToString("dd/MM/yyyy")</td>
-                <td>@item.MontoDia.ToString("C")</td>
+                <td>@item.MontoDia.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</td>
                 <td>
                     @if (item.FechaCancelacion is not null)
                     {
