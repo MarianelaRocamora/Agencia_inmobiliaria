@@ -263,8 +263,9 @@ namespace Agencia_inmobiliaria.Controllers
 
                 return Json(resultado);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                logger.LogError(ex, "Error al buscar inmuebles disponibles");
                 return Json(new List<object>());
             }
         }

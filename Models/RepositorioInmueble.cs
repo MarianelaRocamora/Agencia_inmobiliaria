@@ -213,7 +213,7 @@ namespace Agencia_inmobiliaria.Models
             string sql = @"SELECT inm.ID_inmueble, inm.direccion, inm.cupo, inm.ID_tipo_inmueble, 
                             inm.latitud, inm.longitud, inm.precio_dia, inm.porcentaje_reserva, 
                             inm.ID_propietario, inm.estado, inm.disponible, inm.portada,
-                            ti.nombre AS tipoNombre,
+                            ti.nombre AS tipoNombre
                            FROM inmueble inm
                            JOIN tipo_inmueble ti ON inm.ID_tipo_inmueble = ti.ID_tipo_inmueble
                              AND inm.disponible = 1
