@@ -28,12 +28,8 @@ builder.Services.AddScoped<IRepositorioTipoInmueble, RepositorioTipoInmueble>();
 builder.Services.AddScoped<IRepositorioInmueble, RepositorioInmueble>(); 
 builder.Services.AddScoped<IRepositorioReserva, RepositorioReserva>();
 builder.Services.AddScoped<IRepositorioImagen, RepositorioImagen>();
-<<<<<<< Updated upstream
 builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
-=======
 builder.Services.AddScoped<IRepositorioPago, RepositorioPago>();
->>>>>>> Stashed changes
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
