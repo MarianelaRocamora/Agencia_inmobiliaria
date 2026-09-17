@@ -272,12 +272,35 @@ namespace Agencia_inmobiliaria.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+
         // POST: Reserva/Cancelar/:id
+        // Recalcula todo contra la reserva real (no confía en fechas ocultas del form),
+        // calcula la multa por finalización anticipada y la carga como Pago en la misma operación.
         [HttpPost, ActionName("Cancelar")]
         [ValidateAntiForgeryToken]
-        public IActionResult CancelarConfirmado(int id, DateTime fechaCancelacion, DateTime fechaIngreso, DateTime fechaEgreso)
+        public IActionResult CancelarConfirmado(int id, DateTime fechaCancelacion)
         {
-            if (fechaCancelacion.Date < fechaIngreso.Date || fechaCancelacion.Date >= fechaEgreso.Date)
+            Reserva? reserva;
+            try
+            {
+                reserva = repositorio.ObtenerPorId(id);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al obtener la reserva para cancelar (Id: {Id})", id);
+                TempData["error"] = "No se pudo cargar la reserva. Intente nuevamente.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (reserva == null) return NotFound();
+
+            if (reserva.FechaCancelacion is not null)
+            {
+                TempData["error"] = "Esta reserva ya fue cancelada.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            if (fechaCancelacion.Date < reserva.FechaIngreso.Date || fechaCancelacion.Date >= reserva.FechaEgreso.Date)
             {
                 TempData["error"] = "La fecha de cancelación debe estar entre el inicio y el fin original de la reserva.";
                 return RedirectToAction(nameof(Cancelar), new { id });
@@ -289,7 +312,19 @@ namespace Agencia_inmobiliaria.Controllers
 
                 if (filasAfectadas > 0)
                 {
-                    TempData["success"] = "Reserva cancelada exitosamente";
+                    decimal multa = CalcularMulta(reserva, fechaCancelacion);
+
+                    var pagoMulta = new Pago
+                    {
+                        Concepto = "Multa por finalización anticipada",
+                        FechaPago = DateTime.Today,
+                        Importe = multa,
+                        IdReserva = id,
+                        Estado = true
+                    };
+                    repositorioPago.Alta(pagoMulta);
+
+                    TempData["success"] = $"Reserva cancelada exitosamente. Se generó una multa de {multa.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))} en los pagos de la reserva.";
                 }
                 else
                 {
@@ -302,7 +337,22 @@ namespace Agencia_inmobiliaria.Controllers
                 TempData["error"] = "No se pudo cancelar la reserva. Intente nuevamente.";
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        // Calcula la multa por finalización anticipada 
+        // si se cumplió menos de la mitad del tiempo original, 50% del monto restante de alquiler;
+        // caso contrario, 25% del monto restante.
+        private static decimal CalcularMulta(Reserva reserva, DateTime fechaCancelacion)
+        {
+            int diasTotales = (reserva.FechaEgreso - reserva.FechaIngreso).Days;
+            int diasCumplidos = (fechaCancelacion.Date - reserva.FechaIngreso.Date).Days;
+            int diasRestantes = Math.Max(diasTotales - diasCumplidos, 0);
+
+            decimal montoRestante = reserva.MontoDia * diasRestantes;
+            decimal porcentaje = diasCumplidos < diasTotales / 2.0 ? 0.50m : 0.25m;
+
+            return Math.Round(montoRestante * porcentaje, 2);
         }
 
         // GET: Reserva/Extender/:id

@@ -1,7 +1,7 @@
 @model Agencia_inmobiliaria.Models.Reserva
-
 @{
     ViewData["Title"] = "Detalle de la Reserva";
+    var pagos = ViewBag.Pagos as IList<Agencia_inmobiliaria.Models.Pago> ?? new List<Agencia_inmobiliaria.Models.Pago>();
 }
 
 <h1>Detalle de la Reserva</h1>
@@ -66,9 +66,15 @@
             <span class="text-muted">---</span>
         }
     </dd>
+
+    @if (ViewBag.SenaSugerida is decimal senaSugerida)
+    {
+        <dt class="col-sm-3">Seña sugerida</dt>
+        <dd class="col-sm-9">@senaSugerida.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</dd>
+    }
 </dl>
 
-<div class="mt-4">
+<div class="mt-4 mb-4">
     <a asp-action="Edit" asp-route-id="@Model.IdReserva" class="btn btn-warning">Editar</a>
 
     @if (Model.FechaCancelacion is null)
@@ -79,3 +85,80 @@
 
     <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
 </div>
+
+<hr />
+
+<h4>Pagos</h4>
+
+@if (!pagos.Any())
+{
+    <p class="text-muted">Todavía no hay pagos registrados para esta reserva.</p>
+}
+else
+{
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th>Concepto</th>
+                <th>Fecha de pago</th>
+                <th>Importe</th>
+                <th>Estado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pago in pagos)
+            {
+                <tr>
+                    <td>@pago.Concepto</td>
+                    <td>@pago.FechaPago.ToString("dd/MM/yyyy")</td>
+                    <td>@pago.Importe.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</td>
+                    <td>
+                        @if (pago.Estado)
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Anulado</span>
+                        }
+                    </td>
+                    <td>
+                        @if (pago.Estado)
+                        {
+                            <a asp-controller="Pago" asp-action="Edit" asp-route-id="@pago.IdPago" class="btn btn-sm btn-warning">Editar concepto</a>
+                            <form asp-controller="Pago" asp-action="Anular" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@pago.IdPago" />
+                                <input type="hidden" name="idReserva" value="@Model.IdReserva" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('¿Anular este pago?');">Anular</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h5>Registrar nuevo pago</h5>
+<form asp-controller="Pago" asp-action="Create" method="post" class="row g-2 align-items-end mb-4">
+    <input type="hidden" name="IdReserva" value="@Model.IdReserva" />
+    <input type="hidden" name="Estado" value="true" />
+
+    <div class="col-md-4">
+        <label class="form-label">Concepto</label>
+        <input type="text" name="Concepto" class="form-control" maxlength="100" required />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Fecha de pago</label>
+        <input type="date" name="FechaPago" class="form-control" max="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Importe</label>
+        <input type="number" step="0.01" min="0.01" name="Importe" class="form-control" required />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Registrar</button>
+    </div>
+</form>
