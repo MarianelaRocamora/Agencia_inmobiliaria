@@ -8,14 +8,16 @@ namespace Agencia_inmobiliaria.Controllers
         private readonly IRepositorioReserva repositorio;
         private readonly IRepositorioInquilino repositorioInquilino;
         private readonly IRepositorioInmueble repositorioInmueble;
+        private readonly IRepositorioPago repositorioPago;
 
         private readonly ILogger<ReservaController> logger;
 
-        public ReservaController(IRepositorioReserva repositorio, IRepositorioInquilino repositorioInquilino, IRepositorioInmueble repositorioInmueble, ILogger<ReservaController> logger)
+       public ReservaController(IRepositorioReserva repositorio, IRepositorioInquilino repositorioInquilino, IRepositorioInmueble repositorioInmueble, IRepositorioPago repositorioPago, ILogger<ReservaController> logger)
         {
             this.repositorio = repositorio;
             this.repositorioInquilino = repositorioInquilino;
             this.repositorioInmueble = repositorioInmueble;
+            this.repositorioPago = repositorioPago;
             this.logger = logger;
         }
 
@@ -252,6 +254,15 @@ namespace Agencia_inmobiliaria.Controllers
             {
                 var reserva = repositorio.ObtenerPorId(id);
                 if (reserva == null) return NotFound();
+
+                ViewBag.Pagos = repositorioPago.ObtenerPorReserva(id);
+
+                if (reserva.Inmueble != null)
+                {
+                    decimal totalReserva = reserva.MontoDia * (decimal)(reserva.FechaEgreso - reserva.FechaIngreso).Days;
+                    ViewBag.SenaSugerida = totalReserva * (reserva.Inmueble.PorcentajeReserva / 100);
+                }
+
                 return View(reserva);
             }
             catch (Exception ex)
@@ -261,7 +272,6 @@ namespace Agencia_inmobiliaria.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
-
         // POST: Reserva/Cancelar/:id
         [HttpPost, ActionName("Cancelar")]
         [ValidateAntiForgeryToken]

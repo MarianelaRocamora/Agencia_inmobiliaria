@@ -85,6 +85,7 @@ CREATE TABLE `inmueble` (
   `ID_propietario` int(11) NOT NULL,
   `estado` tinyint(4) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 
 --
@@ -96,10 +97,38 @@ CREATE TABLE `reserva` (
   `fecha_ingreso` date NOT NULL,
   `fecha_egreso` date NOT NULL,
   `fecha_cancelacion` date DEFAULT NULL,
-  `monto_dia` double NOT NULL,
+  `monto_dia` decimal(10,2) NOT NULL,
   `ID_inmueble` int(11) NOT NULL,
   `ID_inquilino` int(11) NOT NULL,
   `estado` tinyint(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `imagen`
+--
+
+CREATE TABLE `imagen` (
+  `ID_imagen` int(11) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  `ID_inmueble` int(11) NOT NULL,
+  `estado` tinyint(4) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `pago`
+--
+
+CREATE TABLE `pago` (
+  `ID_pago` int(11) NOT NULL,
+  `concepto` varchar(100) NOT NULL,
+  `fecha_pago` date NOT NULL,
+  `importe` decimal(10,2) NOT NULL,
+  `ID_reserva` int(11) NOT NULL,
+  `estado` tinyint(4) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -143,6 +172,20 @@ ALTER TABLE `reserva`
   ADD KEY `ID_inquilino` (`ID_inquilino`);
 
 --
+-- Indices de la tabla `imagen`
+--
+ALTER TABLE `imagen`
+  ADD PRIMARY KEY (`ID_imagen`),
+  ADD KEY `FK_imagen_inmueble` (`ID_inmueble`);
+
+--
+-- Indices de la tabla `pago`
+--
+ALTER TABLE `pago`
+  ADD PRIMARY KEY (`ID_pago`),
+  ADD KEY `FK_pago_reserva` (`ID_reserva`);
+
+--
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
@@ -170,8 +213,23 @@ ALTER TABLE `tipo_inmueble`
 ALTER TABLE `inmueble`
   MODIFY `ID_inmueble` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- AUTO_INCREMENT de la tabla `reserva`
+--
 ALTER TABLE `reserva`
   MODIFY `ID_reserva` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `imagen`
+--
+ALTER TABLE `imagen`
+  MODIFY `ID_imagen` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `pago`
+--
+ALTER TABLE `pago`
+  MODIFY `ID_pago` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
@@ -190,6 +248,18 @@ ALTER TABLE `inmueble`
 ALTER TABLE `reserva`
   ADD CONSTRAINT `reserva_ibfk_1` FOREIGN KEY (`ID_inmueble`) REFERENCES `inmueble` (`ID_inmueble`),
   ADD CONSTRAINT `reserva_ibfk_2` FOREIGN KEY (`ID_inquilino`) REFERENCES `inquilino` (`ID_inquilino`);
+
+--
+-- Filtros para la tabla `imagen`
+--
+ALTER TABLE `imagen`
+  ADD CONSTRAINT `FK_imagen_inmueble` FOREIGN KEY (`ID_inmueble`) REFERENCES `inmueble` (`ID_inmueble`);
+
+--
+-- Filtros para la tabla `pago`
+--
+ALTER TABLE `pago`
+  ADD CONSTRAINT `FK_pago_reserva` FOREIGN KEY (`ID_reserva`) REFERENCES `reserva` (`ID_reserva`);
 
 COMMIT;
 

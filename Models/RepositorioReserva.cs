@@ -182,7 +182,7 @@ namespace Agencia_inmobiliaria.Models
             string sql = @"SELECT r.ID_reserva, r.fecha_ingreso, r.fecha_egreso, r.monto_dia, r.ID_inmueble, r.ID_inquilino, r.fecha_cancelacion, r.estado,
                                   i.nombre AS inq_nombre, i.apellido AS inq_apellido, i.dni AS inq_dni, i.telefono, i.email, i.direccion AS inq_direccion,
                                   inm.direccion AS inm_direccion, inm.precio_dia AS inm_precioDia, inm.cupo AS inm_cupo, inm.ID_tipo_inmueble AS inm_idTipoInmueble,
-                                  ti.nombre AS tipoNombre
+                                  ti.nombre AS tipoNombre,
                             FROM reserva r
                             JOIN inquilino i ON r.ID_inquilino = i.ID_inquilino
                             JOIN inmueble inm ON r.ID_inmueble = inm.ID_inmueble
@@ -310,7 +310,15 @@ namespace Agencia_inmobiliaria.Models
                             {
                                 IdInmueble = reader.GetInt32("ID_inmueble"),
                                 Direccion = reader.GetString("inm_direccion"),
-                                PrecioDia = reader.GetDecimal("inm_precioDia")
+                                PrecioDia = reader.GetDecimal("inm_precioDia"),
+                                PorcentajeReserva = reader.GetDecimal("inm_porcentajeReserva"),
+                                Cupo = reader.GetInt32("inm_cupo"),
+                                IdTipoInmueble = reader.GetInt32("inm_idTipoInmueble"),
+                                TipoInmueble = new TipoInmueble
+                                {
+                                    IdTipoInmueble = reader.GetInt32("inm_idTipoInmueble"),
+                                    Nombre = reader.GetString("tipoNombre")
+                                }
                             }
                         });
                     }
