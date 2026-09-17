@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Cancelar Reserva";
+    int diasTotales = (Model.FechaEgreso - Model.FechaIngreso).Days;
 }
 
 <h1>Cancelar Reserva</h1>
@@ -21,26 +22,63 @@
 
         <dt class="col-sm-3">Fecha Egreso (original)</dt>
         <dd class="col-sm-9">@Model.FechaEgreso.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">Monto por día</dt>
+        <dd class="col-sm-9">@Model.MontoDia.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</dd>
     </dl>
+</div>
+
+<div class="alert alert-warning">
+    Al confirmar, el sistema calcula automáticamente la multa por finalización anticipada
+    y la carga como un pago de esta reserva. El dinero ya pagado nunca se devuelve.
 </div>
 
 <form asp-action="Cancelar" method="post">
     <input type="hidden" asp-for="IdReserva" />
-    <input type="hidden" asp-for="FechaIngreso" />
-    <input type="hidden" asp-for="FechaEgreso" />
 
-    <div class="form-group mb-3">
+    <div class="form-group mb-2">
         <label for="fechaCancelacion" class="control-label">Fecha real de finalización</label>
-        <input type="date" 
-               id="fechaCancelacion" 
-               name="fechaCancelacion" 
-               class="form-control" 
-               min="@Model.FechaIngreso.ToString("yyyy-MM-dd")" 
-               max="@Model.FechaEgreso.AddDays(-1).ToString("yyyy-MM-dd")" 
+        <input type="date"
+               id="fechaCancelacion"
+               name="fechaCancelacion"
+               class="form-control"
+               min="@Model.FechaIngreso.ToString("yyyy-MM-dd")"
+               max="@Model.FechaEgreso.AddDays(-1).ToString("yyyy-MM-dd")"
                required />
         <small class="text-muted">Debe ser una fecha entre el inicio y antes del fin original de la reserva.</small>
     </div>
 
+    <div class="alert alert-info">
+        Multa estimada: <strong id="multaEstimada">—</strong>
+        <br /><small class="text-muted">Estimación orientativa; el monto final lo calcula y registra el servidor al confirmar.</small>
+    </div>
+
     <button type="submit" class="btn btn-danger">Confirmar Cancelación</button>
-    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+    <a asp-action="Details" asp-route-id="@Model.IdReserva" class="btn btn-secondary">Volver</a>
 </form>
+
+@section Scripts {
+    <script>
+        const fechaIngreso = new Date("@Model.FechaIngreso.ToString("yyyy-MM-dd")");
+        const diasTotales = @diasTotales;
+        const montoDia = @Model.MontoDia.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+        document.getElementById("fechaCancelacion").addEventListener("change", function () {
+            const fechaCancelacion = new Date(this.value);
+            const salida = document.getElementById("multaEstimada");
+
+            if (isNaN(fechaCancelacion.getTime())) {
+                salida.textContent = "—";
+                return;
+            }
+
+            const diasCumplidos = Math.round((fechaCancelacion - fechaIngreso) / (1000 * 60 * 60 * 24));
+            const diasRestantes = Math.max(diasTotales - diasCumplidos, 0);
+            const montoRestante = montoDia * diasRestantes;
+            const porcentaje = diasCumplidos < diasTotales / 2 ? 0.50 : 0.25;
+            const multa = Math.round(montoRestante * porcentaje * 100) / 100;
+
+            salida.textContent = multa.toLocaleString("en-US", { style: "currency", currency: "USD" });
+        });
+    </script>
+}

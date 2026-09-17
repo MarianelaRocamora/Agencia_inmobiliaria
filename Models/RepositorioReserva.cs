@@ -310,7 +310,15 @@ namespace Agencia_inmobiliaria.Models
                             {
                                 IdInmueble = reader.GetInt32("ID_inmueble"),
                                 Direccion = reader.GetString("inm_direccion"),
-                                PrecioDia = reader.GetDecimal("inm_precioDia")
+                                PrecioDia = reader.GetDecimal("inm_precioDia"),
+                                PorcentajeReserva = reader.GetDecimal("inm_porcentajeReserva"),
+                                Cupo = reader.GetInt32("inm_cupo"),
+                                IdTipoInmueble = reader.GetInt32("inm_idTipoInmueble"),
+                                TipoInmueble = new TipoInmueble
+                                {
+                                    IdTipoInmueble = reader.GetInt32("inm_idTipoInmueble"),
+                                    Nombre = reader.GetString("tipoNombre")
+                                }
                             }
                         });
                     }

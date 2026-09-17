@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Extender Reserva";
+    decimal porcentajeReserva = Model.Inmueble?.PorcentajeReserva ?? 0;
 }
 
 <h1>Extender Reserva</h1>
@@ -12,7 +13,8 @@
 
 <div class="mb-3">
     <strong>Inquilino:</strong> @Model.Inquilino?.Nombre @Model.Inquilino?.Apellido<br />
-    <strong>Inmueble:</strong> @Model.Inmueble?.Direccion
+    <strong>Inmueble:</strong> @Model.Inmueble?.Direccion<br />
+    <strong>Precio por día actual:</strong> @Model.MontoDia.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))
 </div>
 
 <form asp-action="Extender" method="post">
@@ -29,15 +31,52 @@
         </div>
         <div class="form-group col-md-6 mb-3">
             <label asp-for="FechaEgreso" class="control-label">Nueva fecha de fin</label>
-            <input asp-for="FechaEgreso" type="date" class="form-control" min="@Model.FechaIngreso.ToString("yyyy-MM-dd")" />
+            <input asp-for="FechaEgreso" type="date" id="fechaEgreso" class="form-control"
+                   min="@Model.FechaIngreso.AddDays(1).ToString("yyyy-MM-dd")" />
         </div>
     </div>
 
     <div class="form-group mb-3">
         <label asp-for="MontoDia" class="control-label">Monto Diario</label>
-        <input asp-for="MontoDia" class="form-control" />
+        <input asp-for="MontoDia" id="montoDia" class="form-control" />
+        <small class="text-muted">Se sugiere según el precio por día actual del inmueble; se puede ajustar.</small>
+    </div>
+
+    <div class="alert alert-info">
+        Precio total de la estadía: <strong id="montoTotal">—</strong><br />
+        Seña sugerida (@porcentajeReserva %): <strong id="senaSugerida">—</strong>
     </div>
 
     <button type="submit" class="btn btn-primary">Confirmar Extensión</button>
     <a asp-action="Details" asp-route-id="@ViewBag.ReservaOriginalId" class="btn btn-secondary">Cancelar</a>
 </form>
+
+@section Scripts {
+    <script>
+        const fechaIngreso = new Date("@Model.FechaIngreso.ToString("yyyy-MM-dd")");
+        const porcentajeReserva = @porcentajeReserva.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+        function recalcular() {
+            const fechaEgreso = new Date(document.getElementById("fechaEgreso").value);
+            const montoDia = parseFloat(document.getElementById("montoDia").value) || 0;
+            const totalOut = document.getElementById("montoTotal");
+            const senaOut = document.getElementById("senaSugerida");
+
+            if (isNaN(fechaEgreso.getTime()) || fechaEgreso <= fechaIngreso) {
+                totalOut.textContent = "—";
+                senaOut.textContent = "—";
+                return;
+            }
+
+            const dias = Math.round((fechaEgreso - fechaIngreso) / (1000 * 60 * 60 * 24));
+            const total = montoDia * dias;
+            const sena = total * (porcentajeReserva / 100);
+
+            totalOut.textContent = total.toLocaleString("en-US", { style: "currency", currency: "USD" }) + ` (${dias} día/s)`;
+            senaOut.textContent = sena.toLocaleString("en-US", { style: "currency", currency: "USD" });
+        }
+
+        document.getElementById("fechaEgreso").addEventListener("change", recalcular);
+        document.getElementById("montoDia").addEventListener("input", recalcular);
+    </script>
+}
