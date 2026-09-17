@@ -9,14 +9,14 @@ namespace Agencia_inmobiliaria.Controllers
         private readonly IRepositorioTipoInmueble repositorioTipoInmueble;
         private readonly IRepositorioPropietario repositorioPropietario;
         private readonly IRepositorioImagen repositorioImagen;
-        private readonly ILogger<ReservaController> logger;
+        private readonly ILogger<InmuebleController> logger;
 
         public InmuebleController(
             IRepositorioInmueble repositorio,
             IRepositorioTipoInmueble repositorioTipoInmueble,
             IRepositorioPropietario repositorioPropietario,
             IRepositorioImagen repositorioImagen,
-            ILogger<ReservaController> logger)
+            ILogger<InmuebleController> logger)
         {
             this.repositorio = repositorio;
             this.repositorioTipoInmueble = repositorioTipoInmueble;

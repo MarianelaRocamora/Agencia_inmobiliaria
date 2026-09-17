@@ -3,15 +3,35 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Agencia Inmobiliaria</h1>
-    <p>Sistema de gestión de Inmobiliaria.</p>
+    <h1 class="display-4">
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            <text>Bienvenido/a, @User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value</text>
+        }
+        else
+        {
+            <text>Bienvenido a Agencia Inmobiliaria</text>
+        }
+    </h1>
+    <p>Sistema de gestión de inquilinos y propietarios.</p>
 
-    <div class="d-flex justify-content-center gap-3 mt-4">
-        <a asp-controller="Inquilino" asp-action="Index" class="btn btn-primary btn-lg">
-            Gestionar Inquilinos
-        </a>
-        <a asp-controller="Propietario" asp-action="Index" class="btn btn-primary btn-lg">
-            Gestionar Propietarios
-        </a>
-    </div>
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <a asp-controller="Inquilino" asp-action="Index" class="btn btn-primary btn-lg">
+                Gestionar Inquilinos
+            </a>
+            <a asp-controller="Propietario" asp-action="Index" class="btn btn-primary btn-lg">
+                Gestionar Propietarios
+            </a>
+        </div>
+    }
+    else
+    {
+        <p class="mt-4">
+            <a asp-controller="Usuario" asp-action="Login" class="btn btn-primary btn-lg">Iniciar sesión</a>
+            o
+            <a asp-controller="Usuario" asp-action="Register" class="btn btn-outline-secondary btn-lg">Registrarse</a>
+        </p>
+    }
 </div>
