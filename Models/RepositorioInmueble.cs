@@ -170,41 +170,41 @@ namespace Agencia_inmobiliaria.Models
 
         public Inmueble? ObtenerPorId(int id)
         {
-            Inmueble? inmueble = null;
-            string sql = @"SELECT ID_inmueble, direccion, cupo, precio_dia, porcentaje_reserva, latitud, longitud, portada, disponible, ID_tipo_inmueble, ID_propietario, estado
-                            FROM inmueble
-                            WHERE ID_inmueble = @id";
+        Inmueble? inmueble = null;
+        string sql = @"SELECT ID_inmueble, direccion, cupo, precio_dia, porcentaje_reserva, latitud, longitud, portada, disponible, ID_tipo_inmueble, ID_propietario, estado
+                        FROM inmueble
+                        WHERE ID_inmueble = @id";
 
-            using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(connectionString))
+        {
+            var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@id", id);
+
+            connection.Open();
+            using (var reader = command.ExecuteReader())
             {
-                var command = new MySqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@id", id);
-
-                connection.Open();
-                using (var reader = command.ExecuteReader())
+                if (reader.Read())
                 {
-                    if (reader.Read())
+                    inmueble = new Inmueble
                     {
-                        inmueble = new Inmueble
-                        {
-                            IdInmueble = reader.GetInt32("ID_inmueble"),
-                            Direccion = reader.GetString("direccion"),
-                            Cupo = reader.GetInt32("cupo"),
-                            PrecioDia = reader.GetDecimal("precio_dia"),
-                            PorcentajeReserva = reader.GetDecimal("porcentaje_reserva"),
-                            Latitud = reader.GetDecimal("latitud"),
-                            Longitud = reader.GetDecimal("longitud"),
-                            Portada = reader.IsDBNull(reader.GetOrdinal("portada")) ? null : reader.GetString("portada"),
-                            Disponible = reader.GetBoolean("disponible"),
-                            IdTipoInmueble = reader.GetInt32("ID_tipo_inmueble"),
-                            IdPropietario = reader.GetInt32("ID_propietario"),
-                            Estado = reader.GetBoolean("estado")
-                        };
-                    }
+                        IdInmueble = reader.GetInt32("ID_inmueble"),
+                        Direccion = reader.GetString("direccion"),
+                        Cupo = reader.GetInt32("cupo"),
+                        PrecioDia = reader.GetDecimal("precio_dia"),
+                        PorcentajeReserva = reader.GetDecimal("porcentaje_reserva"),
+                        Latitud = reader.GetDecimal("latitud"),
+                        Longitud = reader.GetDecimal("longitud"),
+                        Portada = reader.IsDBNull(reader.GetOrdinal("portada")) ? null : reader.GetString("portada"),
+                        Disponible = reader.GetBoolean("disponible"),
+                        IdTipoInmueble = reader.GetInt32("ID_tipo_inmueble"),
+                        IdPropietario = reader.GetInt32("ID_propietario"),
+                        Estado = reader.GetBoolean("estado")
+                    };
                 }
             }
+        }
 
-            return inmueble;
+        return inmueble;
         }
 
         public IList<Inmueble> ObtenerDisponiblesEntreFechas(DateTime fechaInicio, DateTime fechaFin, int? idReservaExcluir = null)
