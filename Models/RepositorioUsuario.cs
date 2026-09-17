@@ -26,7 +26,7 @@ namespace Agencia_inmobiliaria.Models
                 command.Parameters.AddWithValue("@dni", p.Dni);
                 command.Parameters.AddWithValue("@telefono", (object?)p.Telefono ?? DBNull.Value);
                 command.Parameters.AddWithValue("@direccion", (object?)p.Direccion ?? DBNull.Value);
-                command.Parameters.AddWithValue("@rol", p.Rol);
+                command.Parameters.AddWithValue("@rol", p.Rol.ToString());
                 command.Parameters.AddWithValue("@estado", p.Estado);
 
                 connection.Open();
@@ -77,7 +77,7 @@ namespace Agencia_inmobiliaria.Models
                 command.Parameters.AddWithValue("@dni", p.Dni);
                 command.Parameters.AddWithValue("@telefono", (object?)p.Telefono ?? DBNull.Value);
                 command.Parameters.AddWithValue("@direccion", (object?)p.Direccion ?? DBNull.Value);
-                command.Parameters.AddWithValue("@rol", p.Rol);
+                command.Parameters.AddWithValue("@rol", p.Rol.ToString());
                 command.Parameters.AddWithValue("@password", p.Password);
                 command.Parameters.AddWithValue("@id", p.IdUsuario);
 
