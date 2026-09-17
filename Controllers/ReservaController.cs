@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Agencia_inmobiliaria.Models;
+using System.Security.Claims;
 
 namespace Agencia_inmobiliaria.Controllers
 {
@@ -96,6 +97,7 @@ namespace Agencia_inmobiliaria.Controllers
                     return View(reserva);
                 }
 
+                reserva.IdUsuarioCreador = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 repositorio.Alta(reserva);
                 TempData["success"] = "Reserva creada exitosamente";
                 return RedirectToAction(nameof(Index));
@@ -306,9 +308,11 @@ namespace Agencia_inmobiliaria.Controllers
                 return RedirectToAction(nameof(Cancelar), new { id });
             }
 
+            int idUsuarioActual = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
             try
             {
-                int filasAfectadas = repositorio.Cancelar(id, fechaCancelacion);
+                int filasAfectadas = repositorio.Cancelar(id, fechaCancelacion, idUsuarioActual);
 
                 if (filasAfectadas > 0)
                 {

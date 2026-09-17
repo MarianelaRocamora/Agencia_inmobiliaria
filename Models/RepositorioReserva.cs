@@ -11,8 +11,8 @@ namespace Agencia_inmobiliaria.Models
         public int Alta(Reserva p)
         {
             int id = 0;
-            string sql = @"INSERT INTO reserva (fecha_ingreso, fecha_egreso, monto_dia, ID_inmueble, ID_inquilino, estado)
-                            VALUES (@fecha_ingreso, @fecha_egreso, @monto_dia, @ID_inmueble, @ID_inquilino, @estado);
+            string sql = @"INSERT INTO reserva (fecha_ingreso, fecha_egreso, monto_dia, ID_inmueble, ID_inquilino, ID_usuario_creador, estado)
+                            VALUES (@fecha_ingreso, @fecha_egreso, @monto_dia, @ID_inmueble, @ID_inquilino, @ID_usuario_creador, @estado);
                             SELECT LAST_INSERT_ID();";
 
             using (var connection = new MySqlConnection(connectionString))
@@ -23,6 +23,7 @@ namespace Agencia_inmobiliaria.Models
                 command.Parameters.AddWithValue("@monto_dia", p.MontoDia);
                 command.Parameters.AddWithValue("@ID_inmueble", p.IdInmueble);
                 command.Parameters.AddWithValue("@ID_inquilino", p.IdInquilino);
+                command.Parameters.AddWithValue("@ID_Usuario_Creador", p.IdUsuarioCreador);
                 command.Parameters.AddWithValue("@estado", p.Estado);
 
                 connection.Open();
@@ -49,17 +50,18 @@ namespace Agencia_inmobiliaria.Models
             return filasAfectadas;
         }
 
-        public int Cancelar(int id, DateTime fechaCancelacion)
+        public int Cancelar(int id, DateTime fechaCancelacion, int idUsuarioFinalizador)
         {
             int filasAfectadas = 0;
             string sql = @"UPDATE reserva SET
-                            fecha_cancelacion = @fecha_cancelacion
-                            WHERE ID_reserva = @id";
+                            fecha_cancelacion = @fecha_cancelacion, ID_usuario_finalizador = @idUsuarioFinalizador
+                            WHERE ID_reserva = @id AND fecha_cancelacion IS NULL";
 
             using (var connection = new MySqlConnection(connectionString))
             {
                 var command = new MySqlCommand(sql, connection);
                 command.Parameters.AddWithValue("@fecha_cancelacion", fechaCancelacion);
+                command.Parameters.AddWithValue("@idUsuarioFinalizador", idUsuarioFinalizador);
                 command.Parameters.AddWithValue("@id", id);
 
                 connection.Open();
@@ -179,14 +181,18 @@ namespace Agencia_inmobiliaria.Models
         public Reserva? ObtenerPorId(int id)
         {
             Reserva? reserva = null;
-            string sql = @"SELECT r.ID_reserva, r.fecha_ingreso, r.fecha_egreso, r.monto_dia, r.ID_inmueble, r.ID_inquilino, r.fecha_cancelacion, r.estado,
+            string sql = @"SELECT r.ID_reserva, r.fecha_ingreso, r.fecha_egreso, r.monto_dia, r.ID_inmueble, r.ID_inquilino, r.fecha_cancelacion, r.estado, r.ID_usuario_creador, r.ID_usuario_finalizador,
                                   i.nombre AS inq_nombre, i.apellido AS inq_apellido, i.dni AS inq_dni, i.telefono, i.email, i.direccion AS inq_direccion,
                                   inm.direccion AS inm_direccion, inm.precio_dia AS inm_precioDia, inm.cupo AS inm_cupo, inm.ID_tipo_inmueble AS inm_idTipoInmueble,
-                                  ti.nombre AS tipoNombre
+                                  ti.nombre AS tipoNombre,
+                                  uc.nombre AS creador_nombre, uc.apellido AS creador_apellido, uc.email AS creador_email, uc.password AS creador_password, uc.dni AS creador_dni,
+                                  uf.nombre AS finalizador_nombre, uf.apellido AS finalizador_apellido, uf.email AS finalizador_email, uf.password AS finalizador_password, uf.dni AS finalizador_dni
                             FROM reserva r
                             JOIN inquilino i ON r.ID_inquilino = i.ID_inquilino
                             JOIN inmueble inm ON r.ID_inmueble = inm.ID_inmueble
                             JOIN tipo_inmueble ti ON inm.ID_tipo_inmueble = ti.ID_tipo_inmueble
+                            JOIN usuario uc ON r.ID_usuario_creador = uc.ID_usuario
+                            LEFT JOIN usuario uf ON r.ID_usuario_finalizador = uf.ID_usuario
                             WHERE ID_reserva = @id";
 
             using (var connection = new MySqlConnection(connectionString))
@@ -211,6 +217,8 @@ namespace Agencia_inmobiliaria.Models
                                                ? (DateTime?)null
                                                : reader.GetDateTime("fecha_cancelacion"),
                             Estado = reader.GetBoolean("estado"),
+                            IdUsuarioCreador = reader.GetInt32("ID_usuario_creador"),
+                            IdUsuarioFinalizador = reader.IsDBNull(reader.GetOrdinal("ID_usuario_finalizador")) ? null : reader.GetInt32("ID_usuario_finalizador"),
                             Inquilino = new Inquilino
                             {
                                 IdInquilino = reader.GetInt32("ID_inquilino"),
@@ -233,7 +241,27 @@ namespace Agencia_inmobiliaria.Models
                                     IdTipoInmueble = reader.GetInt32("inm_idTipoInmueble"),
                                     Nombre = reader.GetString("tipoNombre")
                                 }
+                            },
+                             UsuarioCreador = new Usuario
+                            {
+                                IdUsuario = reader.GetInt32("ID_usuario_creador"),
+                                Nombre = reader.GetString("creador_nombre"),
+                                Apellido = reader.GetString("creador_apellido"),
+                                Email = reader.GetString("creador_email"),
+                                Password = reader.GetString("creador_password"),
+                                Dni = reader.GetString("creador_dni")
+                            },
+
+                            UsuarioFinalizador = reader.IsDBNull(reader.GetOrdinal("ID_usuario_finalizador")) ? null : new Usuario
+                            {
+                                IdUsuario = reader.GetInt32("ID_usuario_finalizador"),
+                                Nombre = reader.GetString("finalizador_nombre"),
+                                Apellido = reader.GetString("finalizador_apellido"),
+                                Email = reader.GetString("finalizador_email"),
+                                Password = reader.GetString("finalizador_password"),
+                                Dni = reader.GetString("finalizador_dni")
                             }
+
                         };
                     }
                 }

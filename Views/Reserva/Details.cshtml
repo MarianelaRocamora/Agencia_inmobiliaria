@@ -161,4 +161,24 @@ else
     <div class="col-md-2">
         <button type="submit" class="btn btn-primary w-100">Registrar</button>
     </div>
+    @if (User.IsInRole("Administrador"))
+    {
+        <hr />
+        <h5>Auditoría</h5>
+        <dl class="row">
+            <dt class="col-sm-3">Creada por</dt>
+            <dd class="col-sm-9">
+                @Model.UsuarioCreador?.Nombre @Model.UsuarioCreador?.Apellido
+                <span class="text-muted">(ID: @Model.UsuarioCreador?.IdUsuario)</span>
+            </dd>
+            
+
+            <dt class="col-sm-3">Finalizada por</dt>
+            <dd class="col-sm-9">
+                @(Model.UsuarioFinalizador != null 
+                ? $"{Model.UsuarioFinalizador.Nombre} {Model.UsuarioFinalizador.Apellido} (ID: {Model.UsuarioFinalizador.IdUsuario})" 
+                : "-")
+            </dd>
+        </dl>
+    }
 </form>

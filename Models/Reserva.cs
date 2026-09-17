@@ -25,6 +25,12 @@ namespace Agencia_inmobiliaria.Models
         public Inquilino? Inquilino { get; set; }
         public Inmueble? Inmueble { get; set; }
 
+        public int IdUsuarioCreador { get; set; }
+        public Usuario? UsuarioCreador { get; set; }
+
+        public int? IdUsuarioFinalizador { get; set; }  
+        public Usuario? UsuarioFinalizador { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (FechaEgreso <= FechaIngreso)

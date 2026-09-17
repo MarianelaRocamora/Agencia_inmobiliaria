@@ -100,6 +100,8 @@ CREATE TABLE `reserva` (
   `monto_dia` decimal(10,2) NOT NULL,
   `ID_inmueble` int(11) NOT NULL,
   `ID_inquilino` int(11) NOT NULL,
+  `ID_usuario_creador` int(11) NOT NULL,
+  `ID_usuario_finalizador` int(11) DEFAULT NULL,
   `estado` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -188,7 +190,9 @@ ALTER TABLE `inmueble`
 ALTER TABLE `reserva`
   ADD PRIMARY KEY (`ID_reserva`),
   ADD KEY `ID_inmueble` (`ID_inmueble`),
-  ADD KEY `ID_inquilino` (`ID_inquilino`);
+  ADD KEY `ID_inquilino` (`ID_inquilino`),
+  ADD KEY `ID_usuario_finalizador` (`ID_usuario_finalizador`),
+  ADD KEY `ID_usuario_creador` (`ID_usuario_creador`);
 
 --
 -- Indices de la tabla `imagen`
@@ -276,7 +280,9 @@ ALTER TABLE `inmueble`
 --
 ALTER TABLE `reserva`
   ADD CONSTRAINT `reserva_ibfk_1` FOREIGN KEY (`ID_inmueble`) REFERENCES `inmueble` (`ID_inmueble`),
-  ADD CONSTRAINT `reserva_ibfk_2` FOREIGN KEY (`ID_inquilino`) REFERENCES `inquilino` (`ID_inquilino`);
+  ADD CONSTRAINT `reserva_ibfk_2` FOREIGN KEY (`ID_inquilino`) REFERENCES `inquilino` (`ID_inquilino`),
+  ADD CONSTRAINT `reserva_ibfk_3` FOREIGN KEY (`ID_usuario_finalizador`) REFERENCES `usuario` (`ID_usuario`),
+  ADD CONSTRAINT `reserva_ibfk_4` FOREIGN KEY (`ID_usuario_creador`) REFERENCES `usuario` (`ID_usuario`);
 
 --
 -- Filtros para la tabla `imagen`
