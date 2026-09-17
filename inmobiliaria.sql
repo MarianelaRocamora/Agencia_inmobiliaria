@@ -131,6 +131,25 @@ CREATE TABLE `pago` (
   `estado` tinyint(4) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `usuario`
+--
+
+CREATE TABLE `usuario` (
+  `ID_usuario` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `avatar` varchar(255) DEFAULT NULL,
+  `nombre` varchar(30) NOT NULL,
+  `apellido` varchar(30) NOT NULL,
+  `dni` varchar(15) NOT NULL,
+  `telefono` varchar(20) DEFAULT NULL,
+  `direccion` varchar(255) DEFAULT NULL,
+  `rol` enum('Empleado','Administrador') NOT NULL,
+  `estado` tinyint(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 --
 -- Índices para tablas volcadas
 --
@@ -186,6 +205,11 @@ ALTER TABLE `pago`
   ADD KEY `FK_pago_reserva` (`ID_reserva`);
 
 --
+-- Indices de la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  ADD PRIMARY KEY (`ID_usuario`);
+--
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
@@ -231,6 +255,11 @@ ALTER TABLE `imagen`
 ALTER TABLE `pago`
   MODIFY `ID_pago` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- AUTO_INCREMENT de la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  MODIFY `ID_usuario` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- Restricciones para tablas volcadas
 --
