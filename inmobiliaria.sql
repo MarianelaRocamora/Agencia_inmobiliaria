@@ -154,6 +154,14 @@ CREATE TABLE `usuario` (
   `rol` enum('Empleado','Administrador') NOT NULL,
   `estado` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `usuario`
+--
+
+INSERT INTO `usuario` (`ID_usuario`, `email`, `password`, `avatar`, `nombre`, `apellido`, `dni`, `telefono`, `direccion`, `rol`, `estado`) VALUES
+(1, 'admin@inmobiliaria.com', 'AQAAAAIAAYagAAAAEAcBv0jX5BrkWtOBeeckXDRbcnrB36cdsrCTikh9pPVqhv6pGtviwFa9rhcyDfiIlw==', NULL, 'Ignacio', 'Gómez', '38.452.197', NULL, NULL, 'Administrador', 1),
+(2, 'empleado@inmobiliaria.com', 'AQAAAAIAAYagAAAAEJaWBM5W7LFs9FlsbXAyjF05+nwa3cu3fRwF6DDNdNJiV4ae6qncTzLT9pYYUFso/A==', NULL, 'Julián', ' Ramos', '41.894.822', NULL, NULL, 'Empleado', 1);
 --
 -- Índices para tablas volcadas
 --
@@ -267,7 +275,7 @@ ALTER TABLE `pago`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `ID_usuario` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- Restricciones para tablas volcadas
 --
