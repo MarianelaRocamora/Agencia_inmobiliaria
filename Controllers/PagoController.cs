@@ -19,6 +19,7 @@ namespace Agencia_inmobiliaria.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Pago pago)
         {
@@ -49,6 +50,7 @@ namespace Agencia_inmobiliaria.Controllers
             return RedirectToAction("Details", "Reserva", new { id = pago.IdReserva });
         }
 
+        [Authorize]
         public IActionResult Edit(int id)
         {
             try
@@ -66,6 +68,7 @@ namespace Agencia_inmobiliaria.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Pago pago)
         {
@@ -104,6 +107,7 @@ namespace Agencia_inmobiliaria.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public IActionResult Anular(int id, int idReserva)
         {

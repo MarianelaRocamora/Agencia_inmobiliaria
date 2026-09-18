@@ -324,6 +324,7 @@ namespace Agencia_inmobiliaria.Controllers
                         FechaPago = DateTime.Today,
                         Importe = multa,
                         IdReserva = id,
+                        IdUsuarioCreador = idUsuarioActual, 
                         Estado = true
                     };
                     repositorioPago.Alta(pagoMulta);
@@ -360,6 +361,7 @@ namespace Agencia_inmobiliaria.Controllers
         }
 
         // GET: Reserva/Extender/:id
+        // GET: Reserva/Extender/:id
         public IActionResult Extender(int id)
         {
             try
@@ -373,15 +375,19 @@ namespace Agencia_inmobiliaria.Controllers
                     return RedirectToAction(nameof(Details), new { id });
                 }
 
-                
+                // Se piden directo a sus propios repositorios para garantizar que Inquilino
+                // e Inmueble vengan siempre completos (con % de reserva incluido).
+                var inquilino = repositorioInquilino.ObtenerPorId(reservaOriginal.IdInquilino);
+                var inmueble = repositorioInmueble.ObtenerPorId(reservaOriginal.IdInmueble);
+
                 var nuevaReserva = new Reserva
                 {
                     IdInquilino = reservaOriginal.IdInquilino,
                     IdInmueble = reservaOriginal.IdInmueble,
-                    Inquilino = reservaOriginal.Inquilino,
-                    Inmueble = reservaOriginal.Inmueble,
-                    FechaIngreso = reservaOriginal.FechaEgreso,  
-                    MontoDia = reservaOriginal.MontoDia
+                    Inquilino = inquilino,
+                    Inmueble = inmueble,
+                    FechaIngreso = reservaOriginal.FechaEgreso,
+                    MontoDia = inmueble?.PrecioDia ?? reservaOriginal.MontoDia
                 };
 
                 ViewBag.ReservaOriginalId = reservaOriginal.IdReserva;
