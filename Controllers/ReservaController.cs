@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Agencia_inmobiliaria.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Agencia_inmobiliaria.Controllers
 {
+    [Authorize]
     public class ReservaController : Controller
     {
         private readonly IRepositorioReserva repositorio;
@@ -12,6 +14,7 @@ namespace Agencia_inmobiliaria.Controllers
         private readonly IRepositorioPago repositorioPago;
 
         private readonly ILogger<ReservaController> logger;
+
 
        public ReservaController(IRepositorioReserva repositorio, IRepositorioInquilino repositorioInquilino, IRepositorioInmueble repositorioInmueble, IRepositorioPago repositorioPago, ILogger<ReservaController> logger)
         {
@@ -22,6 +25,7 @@ namespace Agencia_inmobiliaria.Controllers
             this.logger = logger;
         }
 
+        [AllowAnonymous]
         public IActionResult Index(int pagina = 1)
         {
             try
@@ -206,6 +210,7 @@ namespace Agencia_inmobiliaria.Controllers
         }
 
         // GET: Reserva/Delete/:id
+        [Authorize(Roles = "Administrador")]
         public IActionResult Delete(int id)
         {
             try
@@ -224,6 +229,7 @@ namespace Agencia_inmobiliaria.Controllers
 
         // POST: Reserva/Delete/:id
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Administrador")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {

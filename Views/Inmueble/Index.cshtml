@@ -75,7 +75,10 @@
                         <td>
                             <a asp-action="Details" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-info">Detalles</a>
                             <a asp-action="Edit" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-secondary">Editar</a>
-                            <a asp-action="Delete" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-danger">Eliminar</a>
+                            @if (User.IsInRole("Administrador"))
+                            {
+                                <a asp-action="Delete" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-danger">Eliminar</a>
+                            }
                         </td>
                     </tr>
                 }
@@ -187,6 +190,9 @@
 
 @section Scripts {
     <script>
+        const esAdministrador = @(User.IsInRole("Administrador") ? "true" : "false");
+    </script>
+    <script>
         const filtroDisponible = document.getElementById('filtroDisponible');
         const cuerpoTablaInmuebles = document.getElementById('cuerpoTablaInmuebles');
         const paginacionNormalInm = document.getElementById('paginacionNormal');
@@ -207,6 +213,9 @@
                     if (data.inmuebles.length === 0) {
                         cuerpoTablaInmuebles.innerHTML = '<tr><td colspan="7" class="text-muted text-center">No hay inmuebles para este filtro.</td></tr>';
                     } else {
+                        const botonEliminar = esAdministrador
+                                    ? `<a href="/Inmueble/Delete/${i.id}" class="btn btn-sm btn-danger">Eliminar</a>`
+                                    : '';
                         data.inmuebles.forEach(i => {
                             const badge = i.disponible
                                 ? '<span class="badge bg-success">Sí</span>'
@@ -223,7 +232,7 @@
                                     <td>
                                         <a href="/Inmueble/Details/${i.id}" class="btn btn-sm btn-info">Detalles</a>
                                         <a href="/Inmueble/Edit/${i.id}" class="btn btn-sm btn-secondary">Editar</a>
-                                        <a href="/Inmueble/Delete/${i.id}" class="btn btn-sm btn-danger">Eliminar</a>
+                                        ${botonEliminar}
                                     </td>
                                 </tr>`;
                         });

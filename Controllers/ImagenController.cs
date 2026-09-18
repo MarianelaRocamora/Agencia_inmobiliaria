@@ -1,8 +1,10 @@
 using Agencia_inmobiliaria.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Agencia_inmobiliaria.Controllers
 {
+	[Authorize]
     public class ImagenController : Controller
     {
         private readonly IRepositorioImagen repositorio;
@@ -82,7 +84,7 @@ namespace Agencia_inmobiliaria.Controllers
         		}
 				//return Ok(repositorio.BuscarPorInmueble(imagen.IdInmueble));
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				//return BadRequest(ex.Message);
 				TempData["error"] = "No se pudo eliminar la imagen. Intente nuevamente.";

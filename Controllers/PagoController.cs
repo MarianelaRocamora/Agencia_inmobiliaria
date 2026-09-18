@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Agencia_inmobiliaria.Controllers
 {
+    
     public class PagoController : Controller
     {
         private readonly IRepositorioPago repositorio;

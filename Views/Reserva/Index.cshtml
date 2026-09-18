@@ -55,7 +55,11 @@
                 <td>
                     <a asp-action="Details" asp-route-id="@item.IdReserva" class="btn btn-sm btn-info">Ver</a>
                     <a asp-action="Edit" asp-route-id="@item.IdReserva" class="btn btn-sm btn-warning">Editar</a>
-                    <a asp-action="Delete" asp-route-id="@item.IdReserva" class="btn btn-sm btn-danger">Eliminar</a>
+                    @if (User.IsInRole("Administrador"))
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.IdReserva" class="btn btn-sm btn-danger">Eliminar</a>
+                    }
+                    
                 </td>
             </tr>
         }
@@ -104,6 +108,9 @@
 
 @section Scripts {
     <script>
+        const esAdministrador = @(User.IsInRole("Administrador") ? "true" : "false");
+    </script>
+    <script>
         const filtroSelect = document.getElementById('filtro');
         const cuerpoTabla = document.getElementById('cuerpoTabla');
         const paginacionNormal = document.getElementById('paginacionNormal');
@@ -118,6 +125,9 @@
                     if (data.reservas.length === 0) {
                         cuerpoTabla.innerHTML = '<tr><td colspan="7" class="text-muted text-center">No hay reservas vigentes.</td></tr>';
                     } else {
+                        const botonEliminar = esAdministrador
+                                            ? `<a href="/Reserva/Delete/${r.id}" class="btn btn-sm btn-danger">Eliminar</a>`
+                                            : '';
                         data.reservas.forEach(r => {
                             const cancelacion = r.fechaCancelacion
                                 ? `<span class="badge bg-danger">${r.fechaCancelacion}</span>`
@@ -134,7 +144,7 @@
                                     <td class="text-end">
                                         <a href="/Reserva/Details/${r.id}" class="btn btn-sm btn-info">Ver</a>
                                         <a href="/Reserva/Edit/${r.id}" class="btn btn-sm btn-warning">Editar</a>
-                                        <a href="/Reserva/Delete/${r.id}" class="btn btn-sm btn-danger">Eliminar</a>
+                                        ${botonEliminar}
                                     </td>
                                 </tr>`;
                         });
@@ -191,6 +201,9 @@
                     if (data.reservas.length === 0) {
                         cuerpoTabla.innerHTML = '<tr><td colspan="7" class="text-muted text-center">No hay reservas que terminen en ese plazo.</td></tr>';
                     } else {
+                        const botonEliminar = esAdministrador
+                                            ? `<a href="/Reserva/Delete/${r.id}" class="btn btn-sm btn-danger">Eliminar</a>`
+                                            : '';
                         data.reservas.forEach(r => {
                             cuerpoTabla.innerHTML += `
                                 <tr>
@@ -203,7 +216,7 @@
                                     <td class="text-end">
                                         <a href="/Reserva/Details/${r.id}" class="btn btn-sm btn-info">Ver</a>
                                         <a href="/Reserva/Edit/${r.id}" class="btn btn-sm btn-warning">Editar</a>
-                                        <a href="/Reserva/Delete/${r.id}" class="btn btn-sm btn-danger">Eliminar</a>
+                                        ${botonEliminar}
                                     </td>
                                 </tr>`;
                         });

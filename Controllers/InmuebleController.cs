@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Agencia_inmobiliaria.Models;
+using Microsoft.AspNetCore.Authorization;
 namespace Agencia_inmobiliaria.Controllers
 {
+    [Authorize]
     public class InmuebleController : Controller
     {
         private readonly IRepositorioInmueble repositorio;
@@ -37,6 +39,7 @@ namespace Agencia_inmobiliaria.Controllers
         }
 
         // GET inmuebles
+        [AllowAnonymous]
         public IActionResult Index(int pagina = 1)
         {
             try
@@ -202,6 +205,7 @@ namespace Agencia_inmobiliaria.Controllers
         }
 
         // GET inmuebles/Delete/intentos
+        [Authorize(Roles = "Administrador")]
         public IActionResult Delete(int id)
         {
             try
@@ -222,6 +226,7 @@ namespace Agencia_inmobiliaria.Controllers
 
         // POST inmuebles/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Administrador")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
