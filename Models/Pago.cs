@@ -28,6 +28,12 @@ namespace Agencia_inmobiliaria.Models
 
         public Reserva? Reserva { get; set; }
 
+        public int IdUsuarioCreador { get; set; }
+        public Usuario? UsuarioCreador { get; set; }
+
+        public int? IdUsuarioAnulador{ get; set; }  
+        public Usuario? UsuarioAnulador { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (FechaPago.Date > DateTime.Today)

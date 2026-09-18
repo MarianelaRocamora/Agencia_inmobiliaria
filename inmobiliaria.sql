@@ -130,7 +130,9 @@ CREATE TABLE `pago` (
   `fecha_pago` date NOT NULL,
   `importe` decimal(10,2) NOT NULL,
   `ID_reserva` int(11) NOT NULL,
-  `estado` tinyint(4) NOT NULL DEFAULT 1
+  `estado` tinyint(4) NOT NULL DEFAULT 1,
+  `ID_usuario_creador` int(11) NOT NULL,
+  `ID_usuario_anulador` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -206,7 +208,9 @@ ALTER TABLE `imagen`
 --
 ALTER TABLE `pago`
   ADD PRIMARY KEY (`ID_pago`),
-  ADD KEY `FK_pago_reserva` (`ID_reserva`);
+  ADD KEY `FK_pago_reserva` (`ID_reserva`),
+  ADD KEY `ID_usuario_creador` (`ID_usuario_creador`),
+  ADD KEY `ID_usuario_anulador` (`ID_usuario_anulador`);
 
 --
 -- Indices de la tabla `usuario`
@@ -294,7 +298,9 @@ ALTER TABLE `imagen`
 -- Filtros para la tabla `pago`
 --
 ALTER TABLE `pago`
-  ADD CONSTRAINT `FK_pago_reserva` FOREIGN KEY (`ID_reserva`) REFERENCES `reserva` (`ID_reserva`);
+  ADD CONSTRAINT `FK_pago_reserva` FOREIGN KEY (`ID_reserva`) REFERENCES `reserva` (`ID_reserva`),
+  ADD CONSTRAINT `pago_ibfk_1` FOREIGN KEY (`ID_usuario_creador`) REFERENCES `usuario` (`ID_usuario`),
+  ADD CONSTRAINT `pago_ibfk_2` FOREIGN KEY (`ID_usuario_anulador`) REFERENCES `usuario` (`ID_usuario`);
 
 COMMIT;
 

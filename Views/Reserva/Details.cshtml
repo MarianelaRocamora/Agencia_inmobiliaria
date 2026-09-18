@@ -127,6 +127,10 @@ else
                         @if (pago.Estado)
                         {
                             <a asp-controller="Pago" asp-action="Edit" asp-route-id="@pago.IdPago" class="btn btn-sm btn-warning">Editar concepto</a>
+                            @if (User.IsInRole("Administrador"))
+                            {
+                                <a asp-controller="Pago" asp-action="Details" asp-route-id="@pago.IdPago" class="btn btn-sm btn-info">Ver</a>
+                            }
                             <form asp-controller="Pago" asp-action="Anular" method="post" class="d-inline">
                                 <input type="hidden" name="id" value="@pago.IdPago" />
                                 <input type="hidden" name="idReserva" value="@Model.IdReserva" />

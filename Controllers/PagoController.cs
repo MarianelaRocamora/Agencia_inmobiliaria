@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Agencia_inmobiliaria.Models;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Agencia_inmobiliaria.Controllers
 {
@@ -34,7 +36,7 @@ namespace Agencia_inmobiliaria.Controllers
                     TempData["error"] = "La reserva no existe.";
                     return RedirectToAction("Index", "Reserva");
                 }
-
+                pago.IdUsuarioCreador = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 repositorio.Alta(pago);
                 TempData["success"] = "Pago registrado exitosamente.";
             }
@@ -105,9 +107,10 @@ namespace Agencia_inmobiliaria.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Anular(int id, int idReserva)
         {
+            int idUsuarioActual = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             try
             {
-                int filasAfectadas = repositorio.Baja(id);
+                int filasAfectadas = repositorio.Baja(id, idUsuarioActual);
                 if (filasAfectadas > 0)
                 {
                     TempData["success"] = "Pago anulado exitosamente.";
@@ -124,6 +127,23 @@ namespace Agencia_inmobiliaria.Controllers
             }
 
             return RedirectToAction("Details", "Reserva", new { id = idReserva });
+        }
+
+        [Authorize(Roles = "Administrador")]
+        public IActionResult Details(int id)
+        {
+            try
+            {
+                var pago = repositorio.ObtenerPorId(id);
+                if (pago == null) return NotFound();
+                return View(pago);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al obtener el detalle del pago (Id: {Id})", id);
+                TempData["error"] = "No se pudo cargar el pago. Intente nuevamente.";
+                return RedirectToAction(nameof(Index));
+            }
         }
     }
 }
