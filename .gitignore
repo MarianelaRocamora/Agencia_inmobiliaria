@@ -1,33 +1,76 @@
-
-*.swp
-*.*~
-project.lock.json
-.DS_Store
-*.pyc
-
-# Visual Studio Code
-.vscode
-
-# User-specific files
-*.suo
+## .NET Core / Visual Studio / VS Code
+bin/
+obj/
+out/
 *.user
+*.suo
 *.userosscache
 *.sln.docstates
 
-# Build results
+## VS Code
+.vs/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+## Build results
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
 x64/
 x86/
-build/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
 bld/
 [Bb]in/
 [Oo]bj/
-msbuild.log
-msbuild.err
-msbuild.wrn
+[Ll]og/
+[Ll]ogs/
 
-# Visual Studio 2015
-.vs/
+## NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Configuración con datos sensibles (usar appsettings.Development.json local, no versionarlo)
+appsettings.Development.json
+appsettings.Local.json
+*.pfx
+
+## Archivos de usuario / IDE
+*.DotSettings.user
+*.rsuser
+.idea/
+
+## MySQL / XAMPP (no versionar datos ni binarios del servidor local)
+*.mysql
+*.ibd
+*.frm
+*.MYD
+*.MYI
+mysql-data/
+xampp/
+
+## Imágenes/archivos subidos por la app en runtime (si se guardan en wwwroot/uploads, por ejemplo)
+wwwroot/imagenes/uploads/
+wwwroot/uploads/
+
+## Sistema operativo
+.DS_Store
+Thumbs.db
+
+## Logs y temporales
+*.log
+*.tmp
+*.bak
+*.swp
