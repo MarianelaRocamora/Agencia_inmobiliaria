@@ -297,6 +297,7 @@ namespace Agencia_inmobiliaria.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult FiltrarPorDisponibilidad(string disponible = "todos", int pagina = 1)
         {
             try
@@ -337,6 +338,7 @@ namespace Agencia_inmobiliaria.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult BuscarPorFechasAjax(DateTime fechaInicio, DateTime fechaFin, int pagina = 1)
         {
             try

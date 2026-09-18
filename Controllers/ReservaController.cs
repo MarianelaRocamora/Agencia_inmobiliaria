@@ -453,6 +453,7 @@ namespace Agencia_inmobiliaria.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Vigentes(int pagina = 1)
         {
             try
@@ -487,6 +488,7 @@ namespace Agencia_inmobiliaria.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult TerminanEn(int dias = 7, int pagina = 1)
         {
             try
