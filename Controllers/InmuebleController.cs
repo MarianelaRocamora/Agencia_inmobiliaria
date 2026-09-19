@@ -56,6 +56,11 @@ namespace Agencia_inmobiliaria.Controllers
                 ViewBag.PaginaActual = pagina;
                 ViewBag.TotalPaginas = totalPaginas;
 
+                var propietarios = repositorioPropietario.ObtenerLista(1, repositorioPropietario.ObtenerCantidad());
+                ViewBag.PropietariosInforme = new SelectList(
+                    propietarios.Select(p => new { p.IdPropietario, NombreCompleto = $"{p.Apellido}, {p.Nombre} - DNI: {p.Dni}" }),
+                    "IdPropietario", "NombreCompleto");
+
                 return View(lista);
             }
             catch (Exception)
@@ -376,7 +381,8 @@ namespace Agencia_inmobiliaria.Controllers
                 return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
             }
         }
-        // Informe: inmuebles más reservados en los últimos "dias"  365
+
+        // Informe: inmuebles más reservados en los últimos "dias" (default 365)
         [HttpGet]
         [AllowAnonymous]
         public IActionResult MasReservados(int dias = 365, int pagina = 1)
@@ -386,13 +392,13 @@ namespace Agencia_inmobiliaria.Controllers
                 int tamPagina = 10;
                 pagina = Math.Max(pagina, 1);
                 dias = dias <= 0 ? 365 : dias;
- 
+
                 var lista = repositorio.ObtenerMasReservados(dias, pagina, tamPagina);
                 int totalRegistros = repositorio.ObtenerCantidadPorDisponibilidad(null);
                 int totalPaginas = totalRegistros == 0
                     ? 1
                     : (totalRegistros % tamPagina == 0 ? totalRegistros / tamPagina : totalRegistros / tamPagina + 1);
- 
+
                 var datos = lista.Select(i => new
                 {
                     id = i.IdInmueble,
@@ -402,7 +408,7 @@ namespace Agencia_inmobiliaria.Controllers
                     precioDia = i.PrecioDia.ToString("C"),
                     cantidadReservas = i.CantidadReservas
                 });
- 
+
                 return Json(new { inmuebles = datos, paginaActual = pagina, totalPaginas });
             }
             catch (Exception ex)
@@ -411,7 +417,7 @@ namespace Agencia_inmobiliaria.Controllers
                 return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
             }
         }
-        
+
         // Informe: inmuebles sin reservas en los últimos "dias" (configurable, ej. 30/60)
         [HttpGet]
         [AllowAnonymous]
@@ -422,13 +428,13 @@ namespace Agencia_inmobiliaria.Controllers
                 int tamPagina = 10;
                 pagina = Math.Max(pagina, 1);
                 dias = dias <= 0 ? 30 : dias;
- 
+
                 var lista = repositorio.ObtenerSinReservas(dias, pagina, tamPagina);
                 int totalRegistros = repositorio.ObtenerCantidadSinReservas(dias);
                 int totalPaginas = totalRegistros == 0
                     ? 1
                     : (totalRegistros % tamPagina == 0 ? totalRegistros / tamPagina : totalRegistros / tamPagina + 1);
- 
+
                 var datos = lista.Select(i => new
                 {
                     id = i.IdInmueble,
@@ -438,7 +444,7 @@ namespace Agencia_inmobiliaria.Controllers
                     precioDia = i.PrecioDia.ToString("C"),
                     disponible = i.Disponible
                 });
- 
+
                 return Json(new { inmuebles = datos, paginaActual = pagina, totalPaginas });
             }
             catch (Exception ex)
@@ -447,6 +453,7 @@ namespace Agencia_inmobiliaria.Controllers
                 return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
             }
         }
+
         // Informe: inmuebles de un propietario específico
         [HttpGet]
         [AllowAnonymous]
@@ -456,13 +463,13 @@ namespace Agencia_inmobiliaria.Controllers
             {
                 int tamPagina = 10;
                 pagina = Math.Max(pagina, 1);
- 
+
                 var lista = repositorio.ObtenerPorPropietario(idPropietario, pagina, tamPagina);
                 int totalRegistros = repositorio.ObtenerCantidadPorPropietario(idPropietario);
                 int totalPaginas = totalRegistros == 0
                     ? 1
                     : (totalRegistros % tamPagina == 0 ? totalRegistros / tamPagina : totalRegistros / tamPagina + 1);
- 
+
                 var datos = lista.Select(i => new
                 {
                     id = i.IdInmueble,
@@ -472,7 +479,7 @@ namespace Agencia_inmobiliaria.Controllers
                     porcentajeReserva = i.PorcentajeReserva,
                     disponible = i.Disponible
                 });
- 
+
                 return Json(new { inmuebles = datos, paginaActual = pagina, totalPaginas });
             }
             catch (Exception ex)
@@ -481,5 +488,5 @@ namespace Agencia_inmobiliaria.Controllers
                 return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
             }
         }
-    }           
-}        
+    }
+}

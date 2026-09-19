@@ -1,4 +1,5 @@
 @model IEnumerable<Agencia_inmobiliaria.Models.Inmueble>
+@using Microsoft.AspNetCore.Mvc.Rendering
 
 @{
     ViewData["Title"] = "Inmuebles";
@@ -17,6 +18,15 @@
     </li>
     <li class="nav-item">
         <button class="nav-link" id="tab-buscar" data-bs-toggle="tab" data-bs-target="#panel-buscar" type="button">Buscar por fechas</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="tab-mas-reservados" data-bs-toggle="tab" data-bs-target="#panel-mas-reservados" type="button">Más reservados</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="tab-sin-reservas" data-bs-toggle="tab" data-bs-target="#panel-sin-reservas" type="button">Sin reservas</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="tab-por-propietario" data-bs-toggle="tab" data-bs-target="#panel-por-propietario" type="button">Por propietario</button>
     </li>
 </ul>
 
@@ -177,6 +187,86 @@
         </table>
 
         <nav id="paginacionBusqueda" aria-label="Paginación de búsqueda">
+            <ul class="pagination justify-content-center"></ul>
+        </nav>
+    </div>
+
+    <div class="tab-pane fade" id="panel-mas-reservados">
+        <p class="text-muted">
+            Inmuebles ordenados por cantidad de reservas en los últimos 365 días.
+        </p>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Dirección</th>
+                    <th>Propietario</th>
+                    <th>Cupo</th>
+                    <th>Precio/día</th>
+                    <th>Reservas (365 días)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoTablaMasReservados"></tbody>
+        </table>
+
+        <nav id="paginacionMasReservados" aria-label="Paginación de más reservados">
+            <ul class="pagination justify-content-center"></ul>
+        </nav>
+    </div>
+
+    <div class="tab-pane fade" id="panel-sin-reservas">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <label for="filtroDiasSinReservas" class="mb-0">Sin reservas en los últimos:</label>
+            <select id="filtroDiasSinReservas" class="form-select" style="width: auto;">
+                <option value="30" selected>30 días</option>
+                <option value="60">60 días</option>
+                <option value="90">90 días</option>
+            </select>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Dirección</th>
+                    <th>Propietario</th>
+                    <th>Cupo</th>
+                    <th>Precio/día</th>
+                    <th>Disponible</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoTablaSinReservas"></tbody>
+        </table>
+
+        <nav id="paginacionSinReservas" aria-label="Paginación de sin reservas">
+            <ul class="pagination justify-content-center"></ul>
+        </nav>
+    </div>
+
+    <div class="tab-pane fade" id="panel-por-propietario">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <label for="selectPropietarioInforme" class="mb-0">Propietario:</label>
+            @Html.DropDownList("selectPropietarioInforme", (SelectList)ViewBag.PropietariosInforme, "-- Seleccioná un propietario --", new { @class = "form-select", style = "width:auto;" })
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Dirección</th>
+                    <th>Cupo</th>
+                    <th>Precio/día</th>
+                    <th>% Reserva</th>
+                    <th>Disponible</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoTablaPorPropietario">
+                <tr><td colspan="6" class="text-muted text-center">Elegí un propietario para ver sus inmuebles.</td></tr>
+            </tbody>
+        </table>
+
+        <nav id="paginacionPorPropietario" aria-label="Paginación por propietario">
             <ul class="pagination justify-content-center"></ul>
         </nav>
     </div>
@@ -445,7 +535,7 @@
                 cargarMasReservados(1);
             }
         });
-        
+
         const cuerpoTablaSinReservas = document.getElementById('cuerpoTablaSinReservas');
         const paginacionSinReservas = document.getElementById('paginacionSinReservas');
         const filtroDiasSinReservas = document.getElementById('filtroDiasSinReservas');
@@ -594,6 +684,5 @@
         selectPropietarioInforme.addEventListener('change', function () {
             cargarPorPropietario(this.value, 1);
         });
-     
     </script>
 }
