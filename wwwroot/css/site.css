@@ -66,15 +66,16 @@ h1, h2, h3, h4, .navbar-brand {
     margin-right: 6px;
 }
 
-.navbar-custom .nav-link {
-    color: rgba(255, 248, 240, 0.85) !important;
-    font-weight: 500;
-    padding: 0.5rem 1rem !important;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    margin-left: 4px;
+.navbar-custom .navbar-nav {
+    gap: 0.15rem;
 }
 
+.navbar-custom .nav-link {
+    color: rgba(255, 248, 240, 0.85) !important;
+    padding: 0.5rem 0.6rem !important;
+    font-size: 0.92rem;
+    white-space: nowrap;
+}
 .navbar-custom .nav-link:hover {
     color: #fff8f0 !important;
     background-color: rgba(255, 248, 240, 0.12);
@@ -87,6 +88,11 @@ h1, h2, h3, h4, .navbar-brand {
 
 .navbar-toggler {
     border-color: rgba(255, 248, 240, 0.35);
+}
+
+.dropdown-item.text-danger:hover {
+    background-color: #fceceb;
+    color: #c0392b !important;
 }
 
 /* Contenido */
