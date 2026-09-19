@@ -329,7 +329,7 @@ namespace Agencia_inmobiliaria.Controllers
                     direccion = i.Direccion,
                     propietario = $"{i.Propietario?.Nombre} {i.Propietario?.Apellido}",
                     cupo = i.Cupo,
-                    precioDia = i.PrecioDia.ToString("C"),
+                    precioDia = i.PrecioDia,
                     porcentajeReserva = i.PorcentajeReserva,
                     disponible = i.Disponible
                 });
@@ -368,7 +368,7 @@ namespace Agencia_inmobiliaria.Controllers
                     direccion = i.Direccion,
                     propietario = $"{i.Propietario?.Nombre} {i.Propietario?.Apellido}",
                     cupo = i.Cupo,
-                    precioDia = i.PrecioDia.ToString("C"),
+                    precioDia = i.PrecioDia,
                     porcentajeReserva = i.PorcentajeReserva,
                     disponible = i.Disponible
                 });
@@ -405,7 +405,7 @@ namespace Agencia_inmobiliaria.Controllers
                     direccion = i.Direccion,
                     propietario = $"{i.Propietario?.Nombre} {i.Propietario?.Apellido}",
                     cupo = i.Cupo,
-                    precioDia = i.PrecioDia.ToString("C"),
+                    precioDia = i.PrecioDia,
                     cantidadReservas = i.CantidadReservas
                 });
 
@@ -441,7 +441,7 @@ namespace Agencia_inmobiliaria.Controllers
                     direccion = i.Direccion,
                     propietario = $"{i.Propietario?.Nombre} {i.Propietario?.Apellido}",
                     cupo = i.Cupo,
-                    precioDia = i.PrecioDia.ToString("C"),
+                    precioDia = i.PrecioDia,
                     disponible = i.Disponible
                 });
 
@@ -475,7 +475,7 @@ namespace Agencia_inmobiliaria.Controllers
                     id = i.IdInmueble,
                     direccion = i.Direccion,
                     cupo = i.Cupo,
-                    precioDia = i.PrecioDia.ToString("C"),
+                    precioDia = i.PrecioDia,
                     porcentajeReserva = i.PorcentajeReserva,
                     disponible = i.Disponible
                 });
