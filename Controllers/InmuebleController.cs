@@ -445,5 +445,41 @@ namespace Agencia_inmobiliaria.Controllers
             {
                 logger.LogError(ex, "Error al obtener el informe de inmuebles sin reservas");
                 return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
-    }
-}
+            }
+        }
+        // Informe: inmuebles de un propietario específico
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult PorPropietario(int idPropietario, int pagina = 1)
+        {
+            try
+            {
+                int tamPagina = 10;
+                pagina = Math.Max(pagina, 1);
+ 
+                var lista = repositorio.ObtenerPorPropietario(idPropietario, pagina, tamPagina);
+                int totalRegistros = repositorio.ObtenerCantidadPorPropietario(idPropietario);
+                int totalPaginas = totalRegistros == 0
+                    ? 1
+                    : (totalRegistros % tamPagina == 0 ? totalRegistros / tamPagina : totalRegistros / tamPagina + 1);
+ 
+                var datos = lista.Select(i => new
+                {
+                    id = i.IdInmueble,
+                    direccion = i.Direccion,
+                    cupo = i.Cupo,
+                    precioDia = i.PrecioDia.ToString("C"),
+                    porcentajeReserva = i.PorcentajeReserva,
+                    disponible = i.Disponible
+                });
+ 
+                return Json(new { inmuebles = datos, paginaActual = pagina, totalPaginas });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al obtener el informe de inmuebles por propietario");
+                return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
+            }
+        }
+    }           
+}        

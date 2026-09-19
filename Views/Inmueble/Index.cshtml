@@ -521,5 +521,79 @@
         filtroDiasSinReservas.addEventListener('change', function () {
             cargarSinReservas(this.value, 1);
         });
+
+        const cuerpoTablaPorPropietario = document.getElementById('cuerpoTablaPorPropietario');
+        const paginacionPorPropietario = document.getElementById('paginacionPorPropietario');
+        const selectPropietarioInforme = document.getElementById('selectPropietarioInforme');
+
+        function cargarPorPropietario(idPropietario, pagina = 1) {
+            if (!idPropietario) {
+                cuerpoTablaPorPropietario.innerHTML = '<tr><td colspan="6" class="text-muted text-center">Elegí un propietario para ver sus inmuebles.</td></tr>';
+                paginacionPorPropietario.querySelector('ul').innerHTML = '';
+                return;
+            }
+
+            fetch(`/Inmueble/PorPropietario?idPropietario=${idPropietario}&pagina=${pagina}`)
+                .then(response => response.json())
+                .then(data => {
+                    cuerpoTablaPorPropietario.innerHTML = '';
+
+                    if (data.inmuebles.length === 0) {
+                        cuerpoTablaPorPropietario.innerHTML = '<tr><td colspan="6" class="text-muted text-center">Este propietario no tiene inmuebles.</td></tr>';
+                    } else {
+                        data.inmuebles.forEach(i => {
+                            const badge = i.disponible
+                                ? '<span class="badge bg-success">Sí</span>'
+                                : '<span class="badge bg-secondary">No</span>';
+                            cuerpoTablaPorPropietario.innerHTML += `
+                                <tr>
+                                    <td>${i.direccion}</td>
+                                    <td>${i.cupo}</td>
+                                    <td>${formatoMoneda.format(i.precioDia)}</td>
+                                    <td>${i.porcentajeReserva} %</td>
+                                    <td>${badge}</td>
+                                    <td><a href="/Inmueble/Details/${i.id}" class="btn btn-sm btn-info">Ver</a></td>
+                                </tr>`;
+                        });
+                    }
+
+                    renderizarPaginacionPorPropietario(data.paginaActual, data.totalPaginas);
+                })
+                .catch(() => {
+                    cuerpoTablaPorPropietario.innerHTML = '<tr><td colspan="6" class="text-danger text-center">Error al cargar el informe.</td></tr>';
+                });
+        }
+
+        function renderizarPaginacionPorPropietario(paginaActual, totalPaginas) {
+            const ul = paginacionPorPropietario.querySelector('ul');
+            let html = '';
+
+            if (totalPaginas > 1) {
+                if (paginaActual > 1) {
+                    html += `<li class="page-item"><a class="page-link" href="#" data-pagina="${paginaActual - 1}">&lsaquo;</a></li>`;
+                }
+                for (let p = 1; p <= totalPaginas; p++) {
+                    html += p === paginaActual
+                        ? `<li class="page-item active"><span class="page-link">${p}</span></li>`
+                        : `<li class="page-item"><a class="page-link" href="#" data-pagina="${p}">${p}</a></li>`;
+                }
+                if (paginaActual < totalPaginas) {
+                    html += `<li class="page-item"><a class="page-link" href="#" data-pagina="${paginaActual + 1}">&rsaquo;</a></li>`;
+                }
+            }
+
+            ul.innerHTML = html;
+            ul.querySelectorAll('a[data-pagina]').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    cargarPorPropietario(selectPropietarioInforme.value, parseInt(this.dataset.pagina));
+                });
+            });
+        }
+
+        selectPropietarioInforme.addEventListener('change', function () {
+            cargarPorPropietario(this.value, 1);
+        });
+     
     </script>
 }
