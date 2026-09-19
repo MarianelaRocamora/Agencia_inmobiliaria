@@ -13,7 +13,7 @@
             <text>Bienvenido a Agencia Inmobiliaria</text>
         }
     </h1>
-    <p>Sistema de gestión de inquilinos y propietarios.</p>
+    <p>Sistema de gestión integral de inquilinos, propietarios, inmuebles y reservas.</p>
 
     @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
@@ -23,6 +23,12 @@
             </a>
             <a asp-controller="Propietario" asp-action="Index" class="btn btn-primary btn-lg">
                 Gestionar Propietarios
+            </a>
+            <a asp-controller="Inmueble" asp-action="Index" class="btn btn-primary btn-lg">
+                Gestionar Inmuebles
+            </a>
+            <a asp-controller="Reserva" asp-action="Index" class="btn btn-primary btn-lg">
+                Gestionar Reservas
             </a>
         </div>
     }
