@@ -411,5 +411,39 @@ namespace Agencia_inmobiliaria.Controllers
                 return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
             }
         }
+        
+        // Informe: inmuebles sin reservas en los últimos "dias" (configurable, ej. 30/60)
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult SinReservas(int dias = 30, int pagina = 1)
+        {
+            try
+            {
+                int tamPagina = 10;
+                pagina = Math.Max(pagina, 1);
+                dias = dias <= 0 ? 30 : dias;
+ 
+                var lista = repositorio.ObtenerSinReservas(dias, pagina, tamPagina);
+                int totalRegistros = repositorio.ObtenerCantidadSinReservas(dias);
+                int totalPaginas = totalRegistros == 0
+                    ? 1
+                    : (totalRegistros % tamPagina == 0 ? totalRegistros / tamPagina : totalRegistros / tamPagina + 1);
+ 
+                var datos = lista.Select(i => new
+                {
+                    id = i.IdInmueble,
+                    direccion = i.Direccion,
+                    propietario = $"{i.Propietario?.Nombre} {i.Propietario?.Apellido}",
+                    cupo = i.Cupo,
+                    precioDia = i.PrecioDia.ToString("C"),
+                    disponible = i.Disponible
+                });
+ 
+                return Json(new { inmuebles = datos, paginaActual = pagina, totalPaginas });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al obtener el informe de inmuebles sin reservas");
+                return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
     }
 }

@@ -9,5 +9,7 @@ namespace  Agencia_inmobiliaria.Models
         IList<Inmueble> ObtenerPorDisponibilidad(bool? disponible, int paginaNro = 1, int tamPagina = 10);
         int ObtenerCantidadPorDisponibilidad(bool? disponible);
         IList<Inmueble> ObtenerMasReservados(int dias, int paginaNro = 1, int tamPagina = 10);
+        IList<Inmueble> ObtenerSinReservas(int dias, int paginaNro = 1, int tamPagina = 10);
+        int ObtenerCantidadSinReservas(int dias);
     }
 }

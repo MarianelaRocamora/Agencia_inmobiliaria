@@ -446,5 +446,80 @@
             }
         });
         
+        const cuerpoTablaSinReservas = document.getElementById('cuerpoTablaSinReservas');
+        const paginacionSinReservas = document.getElementById('paginacionSinReservas');
+        const filtroDiasSinReservas = document.getElementById('filtroDiasSinReservas');
+        const tabSinReservas = document.getElementById('tab-sin-reservas');
+        let sinReservasCargado = false;
+
+        function cargarSinReservas(dias, pagina = 1) {
+            fetch(`/Inmueble/SinReservas?dias=${dias}&pagina=${pagina}`)
+                .then(response => response.json())
+                .then(data => {
+                    cuerpoTablaSinReservas.innerHTML = '';
+
+                    if (data.inmuebles.length === 0) {
+                        cuerpoTablaSinReservas.innerHTML = '<tr><td colspan="6" class="text-muted text-center">No hay inmuebles sin reservas en ese período.</td></tr>';
+                    } else {
+                        data.inmuebles.forEach(i => {
+                            const badge = i.disponible
+                                ? '<span class="badge bg-success">Sí</span>'
+                                : '<span class="badge bg-secondary">No</span>';
+                            cuerpoTablaSinReservas.innerHTML += `
+                                <tr>
+                                    <td>${i.direccion}</td>
+                                    <td>${i.propietario}</td>
+                                    <td>${i.cupo}</td>
+                                    <td>${formatoMoneda.format(i.precioDia)}</td>
+                                    <td>${badge}</td>
+                                    <td><a href="/Inmueble/Details/${i.id}" class="btn btn-sm btn-info">Ver</a></td>
+                                </tr>`;
+                        });
+                    }
+
+                    renderizarPaginacionSinReservas(data.paginaActual, data.totalPaginas);
+                })
+                .catch(() => {
+                    cuerpoTablaSinReservas.innerHTML = '<tr><td colspan="6" class="text-danger text-center">Error al cargar el informe.</td></tr>';
+                });
+        }
+
+        function renderizarPaginacionSinReservas(paginaActual, totalPaginas) {
+            const ul = paginacionSinReservas.querySelector('ul');
+            let html = '';
+
+            if (totalPaginas > 1) {
+                if (paginaActual > 1) {
+                    html += `<li class="page-item"><a class="page-link" href="#" data-pagina="${paginaActual - 1}">&lsaquo;</a></li>`;
+                }
+                for (let p = 1; p <= totalPaginas; p++) {
+                    html += p === paginaActual
+                        ? `<li class="page-item active"><span class="page-link">${p}</span></li>`
+                        : `<li class="page-item"><a class="page-link" href="#" data-pagina="${p}">${p}</a></li>`;
+                }
+                if (paginaActual < totalPaginas) {
+                    html += `<li class="page-item"><a class="page-link" href="#" data-pagina="${paginaActual + 1}">&rsaquo;</a></li>`;
+                }
+            }
+
+            ul.innerHTML = html;
+            ul.querySelectorAll('a[data-pagina]').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    cargarSinReservas(filtroDiasSinReservas.value, parseInt(this.dataset.pagina));
+                });
+            });
+        }
+
+        tabSinReservas.addEventListener('shown.bs.tab', function () {
+            if (!sinReservasCargado) {
+                sinReservasCargado = true;
+                cargarSinReservas(filtroDiasSinReservas.value, 1);
+            }
+        });
+
+        filtroDiasSinReservas.addEventListener('change', function () {
+            cargarSinReservas(this.value, 1);
+        });
     </script>
 }
