@@ -183,7 +183,7 @@ namespace Agencia_inmobiliaria.Models
             Reserva? reserva = null;
             string sql = @"SELECT r.ID_reserva, r.fecha_ingreso, r.fecha_egreso, r.monto_dia, r.ID_inmueble, r.ID_inquilino, r.fecha_cancelacion, r.estado, r.ID_usuario_creador, r.ID_usuario_finalizador,
                                   i.nombre AS inq_nombre, i.apellido AS inq_apellido, i.dni AS inq_dni, i.telefono, i.email, i.direccion AS inq_direccion,
-                                  inm.direccion AS inm_direccion, inm.precio_dia AS inm_precioDia, inm.cupo AS inm_cupo, inm.ID_tipo_inmueble AS inm_idTipoInmueble,
+                                  inm.direccion AS inm_direccion, inm.precio_dia AS inm_precioDia, inm.cupo AS inm_cupo, inm.ID_tipo_inmueble AS inm_idTipoInmueble, inm.porcentaje_reserva,
                                   ti.nombre AS tipoNombre,
                                   uc.nombre AS creador_nombre, uc.apellido AS creador_apellido, uc.email AS creador_email, uc.password AS creador_password, uc.dni AS creador_dni,
                                   uf.nombre AS finalizador_nombre, uf.apellido AS finalizador_apellido, uf.email AS finalizador_email, uf.password AS finalizador_password, uf.dni AS finalizador_dni
@@ -235,6 +235,7 @@ namespace Agencia_inmobiliaria.Models
                                 Direccion = reader.GetString("inm_direccion"),
                                 PrecioDia = reader.GetDecimal("inm_precioDia"),
                                 Cupo = reader.GetInt32("inm_cupo"),
+                                PorcentajeReserva = reader.GetDecimal("porcentaje_reserva"),
                                 IdTipoInmueble = reader.GetInt32("inm_idTipoInmueble"),
                                 TipoInmueble = new TipoInmueble
                                 {
