@@ -216,6 +216,7 @@ namespace Agencia_inmobiliaria.Models
                             ti.nombre AS tipoNombre
                            FROM inmueble inm
                            JOIN tipo_inmueble ti ON inm.ID_tipo_inmueble = ti.ID_tipo_inmueble
+                             AND inm.estado = 1
                              AND inm.disponible = 1
                              AND NOT EXISTS (
                                  SELECT 1 FROM reserva r

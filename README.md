@@ -91,11 +91,14 @@ dotnet run
 ```
 
 ## Credenciales de acceso
-Rol           |	Email	                  |Contraseña     |
-Administrador	| admin@inmobiliaria.com  |	Admin2026!    | 
-Empleado	    |empleado@inmobiliaria.com|	Empleado2026! |
+
+| Rol           | Email                     |  Contraseña    |
+|---|---|---|
+| Administrador | admin@inmobiliaria.com    |Admin2026       | 
+| Empleado      | empleado@inmobiliaria.com |Empleado2026    |
 
 Estos usuarios se crean mediante el INSERT incluido en inmobiliaria.sql.
+
 
 ## Diagrama Entidad-Relación
 

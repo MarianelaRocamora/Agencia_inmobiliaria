@@ -134,7 +134,7 @@ namespace Agencia_inmobiliaria.Controllers
             return RedirectToAction("Details", "Reserva", new { id = idReserva });
         }
 
-        [Authorize(Roles = "Administrador")]
+        [Authorize]
         public IActionResult Details(int id)
         {
             try

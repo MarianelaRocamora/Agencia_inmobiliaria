@@ -4,60 +4,52 @@
     ViewData["Title"] = "Detalles del Pago";
 }
 
-@* Validación adicional en vista para asegurar que solo un administrador acceda *@
-@if (!User.IsInRole("Administrador"))
-{
-    <div class="alert alert-danger" role="alert">
-        <h4 class="alert-heading">Acceso Denegado</h4>
-        <p>No tienes permisos suficientes para ver los detalles de auditoría de este pago.</p>
-    </div>
-}
-else
-{
-    <div class="container mt-4">
-        <div class="card shadow-sm">
-            <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: var(--color-primary);">
-                <h4 class="mb-0">Detalles del Pago #@Model.IdPago</h4>
-                <div>
-                    @if (Model.Estado)
-                    {
-                        <span class="badge bg-success fs-6">Activo</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary fs-6">Anulado</span>
-                    }
-                </div>
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: var(--color-primary);">
+            <h4 class="mb-0">Detalles del Pago #@Model.IdPago</h4>
+            <div>
+                @if (Model.Estado)
+                {
+                    <span class="badge bg-success fs-6">Activo</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary fs-6">Anulado</span>
+                }
             </div>
+        </div>
 
-            <div class="card-body">
-                <h5 class="card-title text-primary border-bottom pb-2">Información del Pago</h5>
-                
-                <dl class="row mt-3">
-                    <dt class="col-sm-3">ID Pago</dt>
-                    <dd class="col-sm-9">@Model.IdPago</dd>
+        <div class="card-body">
+            <h5 class="card-title text-primary border-bottom pb-2">Información del Pago</h5>
+            
+            <dl class="row mt-3">
+                <dt class="col-sm-3">ID Pago</dt>
+                <dd class="col-sm-9">@Model.IdPago</dd>
 
-                    <dt class="col-sm-3">ID Reserva</dt>
-                    <dd class="col-sm-9">@Model.IdReserva</dd>
+                <dt class="col-sm-3">ID Reserva</dt>
+                <dd class="col-sm-9">@Model.IdReserva</dd>
 
-                    <dt class="col-sm-3">Concepto</dt>
-                    <dd class="col-sm-9">@Model.Concepto</dd>
+                <dt class="col-sm-3">Concepto</dt>
+                <dd class="col-sm-9">@Model.Concepto</dd>
 
-                    <dt class="col-sm-3">Fecha de Pago</dt>
-                    <dd class="col-sm-9">@Model.FechaPago.ToString("dd/MM/yyyy")</dd>
+                <dt class="col-sm-3">Fecha de Pago</dt>
+                <dd class="col-sm-9">@Model.FechaPago.ToString("dd/MM/yyyy")</dd>
 
-                    <dt class="col-sm-3">Importe</dt>
-                    <dd class="col-sm-9 fw-bold">
-                        @Model.Importe.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))
-                    </dd>
+                <dt class="col-sm-3">Importe</dt>
+                <dd class="col-sm-9 fw-bold">
+                    @Model.Importe.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))
+                </dd>
 
-                    <dt class="col-sm-3">Estado</dt>
-                    <dd class="col-sm-9">
-                        @(Model.Estado ? "Activo" : "Anulado")
-                    </dd>
-                </dl>
+                <dt class="col-sm-3">Estado</dt>
+                <dd class="col-sm-9">
+                    @(Model.Estado ? "Activo" : "Anulado")
+                </dd>
+            </dl>
 
-                @* Sección de Auditoría exclusivo Administrador *@
+            @* Sección de Auditoría exclusivo Administrador *@
+            @if (User.IsInRole("Administrador"))
+            {
                 <hr class="my-4" />
                 <h5 class="card-title text-primary border-bottom pb-2">Auditoría de Registro</h5>
 
@@ -76,7 +68,7 @@ else
                         }
                     </dd>
 
-                    
+
                     <dt class="col-sm-3">Anulado por</dt>
                     <dd class="col-sm-9">
                         @if (!Model.Estado && Model.UsuarioAnulador != null)
@@ -94,13 +86,13 @@ else
                         }
                     </dd>
                 </dl>
-            </div>
+            }
+        </div>
 
-            <div class="card-footer bg-light text-end">
-                <a asp-controller="Reserva" asp-action="Details" asp-route-id="@Model.IdReserva" class="btn btn-secondary">
-                    Volver a la Reserva
-                </a>
-            </div>
+        <div class="card-footer bg-light text-end">
+            <a asp-controller="Reserva" asp-action="Details" asp-route-id="@Model.IdReserva" class="btn btn-secondary">
+                Volver a la Reserva
+            </a>
         </div>
     </div>
-}
+</div>
