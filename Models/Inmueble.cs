@@ -51,5 +51,6 @@ namespace Agencia_inmobiliaria.Models
         public int IdPropietario {get; set;}
         public Propietario? Propietario { get; set; }   
         public bool Estado { get; set;} = true;
+        public int CantidadReservas { get; set; }
     }
 }

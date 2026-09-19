@@ -376,5 +376,40 @@ namespace Agencia_inmobiliaria.Controllers
                 return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
             }
         }
+        // Informe: inmuebles más reservados en los últimos "dias"  365
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult MasReservados(int dias = 365, int pagina = 1)
+        {
+            try
+            {
+                int tamPagina = 10;
+                pagina = Math.Max(pagina, 1);
+                dias = dias <= 0 ? 365 : dias;
+ 
+                var lista = repositorio.ObtenerMasReservados(dias, pagina, tamPagina);
+                int totalRegistros = repositorio.ObtenerCantidadPorDisponibilidad(null);
+                int totalPaginas = totalRegistros == 0
+                    ? 1
+                    : (totalRegistros % tamPagina == 0 ? totalRegistros / tamPagina : totalRegistros / tamPagina + 1);
+ 
+                var datos = lista.Select(i => new
+                {
+                    id = i.IdInmueble,
+                    direccion = i.Direccion,
+                    propietario = $"{i.Propietario?.Nombre} {i.Propietario?.Apellido}",
+                    cupo = i.Cupo,
+                    precioDia = i.PrecioDia.ToString("C"),
+                    cantidadReservas = i.CantidadReservas
+                });
+ 
+                return Json(new { inmuebles = datos, paginaActual = pagina, totalPaginas });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al obtener el informe de inmuebles más reservados");
+                return Json(new { inmuebles = new List<object>(), paginaActual = 1, totalPaginas = 1 });
+            }
+        }
     }
 }

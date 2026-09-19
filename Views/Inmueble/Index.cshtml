@@ -377,5 +377,74 @@
             ultimaBusqueda = { inicio, fin };
             buscarPorFechas(inicio, fin, 1);
         });
+
+        const cuerpoTablaMasReservados = document.getElementById('cuerpoTablaMasReservados');
+        const paginacionMasReservados = document.getElementById('paginacionMasReservados');
+        const tabMasReservados = document.getElementById('tab-mas-reservados');
+        let masReservadosCargado = false;
+
+        function cargarMasReservados(pagina = 1) {
+            fetch(`/Inmueble/MasReservados?dias=365&pagina=${pagina}`)
+                .then(response => response.json())
+                .then(data => {
+                    cuerpoTablaMasReservados.innerHTML = '';
+
+                    if (data.inmuebles.length === 0) {
+                        cuerpoTablaMasReservados.innerHTML = '<tr><td colspan="6" class="text-muted text-center">No hay inmuebles para mostrar.</td></tr>';
+                    } else {
+                        data.inmuebles.forEach(i => {
+                            cuerpoTablaMasReservados.innerHTML += `
+                                <tr>
+                                    <td>${i.direccion}</td>
+                                    <td>${i.propietario}</td>
+                                    <td>${i.cupo}</td>
+                                    <td>${formatoMoneda.format(i.precioDia)}</td>
+                                    <td>${i.cantidadReservas}</td>
+                                    <td><a href="/Inmueble/Details/${i.id}" class="btn btn-sm btn-info">Ver</a></td>
+                                </tr>`;
+                        });
+                    }
+
+                    renderizarPaginacionMasReservados(data.paginaActual, data.totalPaginas);
+                })
+                .catch(() => {
+                    cuerpoTablaMasReservados.innerHTML = '<tr><td colspan="6" class="text-danger text-center">Error al cargar el informe.</td></tr>';
+                });
+        }
+
+        function renderizarPaginacionMasReservados(paginaActual, totalPaginas) {
+            const ul = paginacionMasReservados.querySelector('ul');
+            let html = '';
+
+            if (totalPaginas > 1) {
+                if (paginaActual > 1) {
+                    html += `<li class="page-item"><a class="page-link" href="#" data-pagina="${paginaActual - 1}">&lsaquo;</a></li>`;
+                }
+                for (let p = 1; p <= totalPaginas; p++) {
+                    html += p === paginaActual
+                        ? `<li class="page-item active"><span class="page-link">${p}</span></li>`
+                        : `<li class="page-item"><a class="page-link" href="#" data-pagina="${p}">${p}</a></li>`;
+                }
+                if (paginaActual < totalPaginas) {
+                    html += `<li class="page-item"><a class="page-link" href="#" data-pagina="${paginaActual + 1}">&rsaquo;</a></li>`;
+                }
+            }
+
+            ul.innerHTML = html;
+            ul.querySelectorAll('a[data-pagina]').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    cargarMasReservados(parseInt(this.dataset.pagina));
+                });
+            });
+        }
+
+        tabMasReservados.addEventListener('shown.bs.tab', function () {
+            if (!masReservadosCargado) {
+                masReservadosCargado = true;
+                cargarMasReservados(1);
+            }
+        });
+        
     </script>
 }

@@ -8,5 +8,6 @@ namespace  Agencia_inmobiliaria.Models
         int ObtenerCantidadDisponiblesEntreFechas(DateTime fechaInicio, DateTime fechaFin);
         IList<Inmueble> ObtenerPorDisponibilidad(bool? disponible, int paginaNro = 1, int tamPagina = 10);
         int ObtenerCantidadPorDisponibilidad(bool? disponible);
+        IList<Inmueble> ObtenerMasReservados(int dias, int paginaNro = 1, int tamPagina = 10);
     }
 }
