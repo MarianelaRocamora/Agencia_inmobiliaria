@@ -125,10 +125,11 @@
                     if (data.reservas.length === 0) {
                         cuerpoTabla.innerHTML = '<tr><td colspan="7" class="text-muted text-center">No hay reservas vigentes.</td></tr>';
                     } else {
-                        const botonEliminar = esAdministrador
+                        
+                        data.reservas.forEach(r => {
+                            const botonEliminar = esAdministrador
                                             ? `<a href="/Reserva/Delete/${r.id}" class="btn btn-sm btn-danger">Eliminar</a>`
                                             : '';
-                        data.reservas.forEach(r => {
                             const cancelacion = r.fechaCancelacion
                                 ? `<span class="badge bg-danger">${r.fechaCancelacion}</span>`
                                 : '<span class="text-muted">---</span>';
@@ -201,10 +202,11 @@
                     if (data.reservas.length === 0) {
                         cuerpoTabla.innerHTML = '<tr><td colspan="7" class="text-muted text-center">No hay reservas que terminen en ese plazo.</td></tr>';
                     } else {
-                        const botonEliminar = esAdministrador
+                        
+                        data.reservas.forEach(r => {
+                            const botonEliminar = esAdministrador
                                             ? `<a href="/Reserva/Delete/${r.id}" class="btn btn-sm btn-danger">Eliminar</a>`
                                             : '';
-                        data.reservas.forEach(r => {
                             cuerpoTabla.innerHTML += `
                                 <tr>
                                     <td>${r.inquilino}</td>

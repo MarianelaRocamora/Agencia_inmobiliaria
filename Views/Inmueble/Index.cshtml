@@ -303,10 +303,11 @@
                     if (data.inmuebles.length === 0) {
                         cuerpoTablaInmuebles.innerHTML = '<tr><td colspan="7" class="text-muted text-center">No hay inmuebles para este filtro.</td></tr>';
                     } else {
-                        const botonEliminar = esAdministrador
+                        
+                        data.inmuebles.forEach(i => {
+                            const botonEliminar = esAdministrador
                                     ? `<a href="/Inmueble/Delete/${i.id}" class="btn btn-sm btn-danger">Eliminar</a>`
                                     : '';
-                        data.inmuebles.forEach(i => {
                             const badge = i.disponible
                                 ? '<span class="badge bg-success">Sí</span>'
                                 : '<span class="badge bg-secondary">No</span>';
